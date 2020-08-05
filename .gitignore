@@ -7,4 +7,4 @@ env/
 /build/
 /dist/
 /venv/
-
+.idea/
