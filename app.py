@@ -4,11 +4,11 @@ import argparse
 
 from flask import Flask
 from flask_restful import Api
-from server.LightAPI import Index, Bulb
+from app.LightAPI import Index, Bulb
 
 if __name__ == '__main__':
 
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder="static", template_folder="templates")
     api = Api(app)
 
     # add resources
@@ -44,6 +44,8 @@ if __name__ == '__main__':
             port = int(hostname[1])
         else:
             sys.exit(-1)
+
+        app.config['EXPLAIN_TEMPLATE_LOADING'] = True
         
         app.run(host=host, port=port, debug=args.debug)
 

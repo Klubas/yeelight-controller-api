@@ -1,8 +1,10 @@
+import os
 import logging
 from flask import request
 from flask_restful import Resource
+from flask import render_template, make_response
 
-from server.LightController import LightController
+from app.LightController import LightController
 
 lights = LightController()
 bulb_names = lights.get_bulb_names()
@@ -11,7 +13,10 @@ bulb_names = lights.get_bulb_names()
 class Index(Resource):
     @staticmethod
     def get():
-        return {'Status': 'OK'}, 200
+        headers = {'Content-Type': 'text/html'}
+        # html = os.path.join('public', 'index.html')
+        html = os.path.join('index.html')
+        return make_response(render_template(html), 200, headers)
 
 
 class Bulb(Resource):
