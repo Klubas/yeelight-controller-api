@@ -39,4 +39,6 @@ class Bulb(Resource):
             , params=params
         )
 
+        print(status)
+
         return {'Response': status}, 200

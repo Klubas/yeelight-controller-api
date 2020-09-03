@@ -27,36 +27,56 @@ class LightController:
                 }
             )
 
+    def music_mode(self, bulb_name=None, start=False):
+        if bulb_name is None:
+            logging.info('Ação não suportada')
+        else:
+
+            bulb = self.get_bulb()
+
+            if start:
+                return bulb.start_music()
+            else:
+                return bulb.stop_music()
+
+
     def turn_on(self, bulb_name=None):
+        response = None
         if bulb_name:
             for bulb in self.bulbs: # refatorar pra receber uma lista?
                 if bulb['name'] == bulb_name:
-                    return bulb['bulb'].turn_on()
+                    response = bulb['bulb'].turn_on()
         else:
             for bulb in self.bulbs:
-                return bulb['bulb'].turn_on()
+                response = bulb['bulb'].turn_on()
+        return response
 
     def turn_off(self, bulb_name=None):
+        response = None
         if bulb_name:
             for bulb in self.bulbs: # refatorar pra receber uma lista?
                 if bulb['name'] == bulb_name:
-                    return bulb['bulb'].turn_off()
+                    response = bulb['bulb'].turn_off()
         else:
             for bulb in self.bulbs:
-                return bulb['bulb'].turn_off()
+                response = bulb['bulb'].turn_off()
+        return response
 
     def set_bulb_color(self, color=(255, 255, 255), bulb_name=None):
-        if bulb_name:
-            for bulb in self.bulbs:
-                if bulb['name'] == bulb_name:
+        try:
+            if bulb_name:
+                for bulb in self.bulbs:
+                    if bulb['name'] == bulb_name:
+                        bulb['bulb'].set_rgb(
+                            red=int(color[0]), green=int(color[1]), blue=int(color[2])
+                        )
+            else:
+                for bulb in self.bulbs:
                     bulb['bulb'].set_rgb(
                         red=int(color[0]), green=int(color[1]), blue=int(color[2])
                     )
-        else:
-            for bulb in self.bulbs:
-                bulb['bulb'].set_rgb(
-                    red=int(color[0]), green=int(color[1]), blue=int(color[2])
-                )
+        except Exception as e:
+            return str(e)
 
     def __get_all_bulbs_properties__(self) -> list:
         properties = list()
@@ -69,6 +89,15 @@ class LightController:
         for bulb in self.bulbs:
             names.append(bulb['name'])
         return names
+
+    def get_bulb(self, bulb_name):
+        if bulb_name:
+            for bulb in self.bulbs: # refatorar pra receber uma lista?
+                if bulb['name'] == bulb_name:
+                    return bulb['bulb']
+        else:
+            for bulb in self.bulbs:
+                return bulb['bulb']
 
     def set_bulb_name(self, new_name, bulb_name=None):
         if not bulb_name or not new_name:
@@ -123,7 +152,12 @@ class LightController:
                     module=__file__, name=name, color=str(color)
                 )
             )
-            self.set_bulb_color(bulb_name=name, color=color)
+            return self.set_bulb_color(bulb_name=name, color=color)
+
+        elif action == 'music':
+
+            start = params['start']
+            return self.music_mode(bulb_name=name, start=start)
 
         elif action == 'rename':
 
@@ -132,6 +166,6 @@ class LightController:
             if not new_name:
                 return
 
-            self.set_bulb_name(new_name=new_name, bulb_name=name)
+            return self.set_bulb_name(new_name=new_name, bulb_name=name)
 
 

@@ -12,7 +12,8 @@ callEndpoint = async (actionValue, paramValue = null) => {
                 {
                     action: actionValue,
                     params: {
-                        color: paramValue
+                        color: paramValue,
+                        start: paramValue
                     }
 
                 }
@@ -39,6 +40,16 @@ function changeLampState(){
 	}
 }
 
+function changeMusicMode(musicMode){
+    callEndpoint('music', musicMode)
+    if(musicMode){
+        btnMusicMode.setAttribute('value', 'Music Mode On')
+    } else {
+        btnMusicMode.setAttribute('value', 'Music Mode Off')
+    }
+    return musicMode
+}
+
 function changeLampColor(newColor){
     console.log(newColor)
     newColor = convertHexToRGB(newColor)
@@ -56,9 +67,6 @@ function convertHexToRGB(hexColor) {
     } : null;
 }
 
-
-const currentLocation = window.location.href
-
 const btnSwitch = document.getElementById('btnSwitch')
 var lampOn = true
 btnSwitch.setAttribute('value', 'Desligar')
@@ -74,4 +82,14 @@ colorLightBulb.addEventListener('change',
     }
 )
 
+var btnMusicMode = document.getElementById('btnMusicMode')
+var musicMode = false
+btnMusicMode.setAttribute('value', 'Music Mode Off')
+btnMusicMode.addEventListener('click',
+    function(){
+        musicMode = changeMusicMode(!musicMode)
+    }
+)
+
+const currentLocation = window.location.href
 console.log(currentLocation)
