@@ -8,3 +8,5 @@ env/
 /dist/
 /venv/
 .idea/
+Pipfile
+.balena
