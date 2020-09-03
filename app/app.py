@@ -4,16 +4,21 @@ import argparse
 
 from flask import Flask
 from flask_restful import Api
-from app.LightAPI import Index, Bulb
+from .LightAPI import Index, Bulb
+
+app = Flask(__name__, static_folder="static", template_folder="templates")
+api = Api(app)
+
+# add resources
+api.add_resource(Index, '/')
+api.add_resource(Bulb, '/light/bulb')
+
+app.config['EXPLAIN_TEMPLATE_LOADING'] = True
+
+host="0.0.0.0"
+port=5000
 
 if __name__ == '__main__':
-
-    app = Flask(__name__, static_folder="static", template_folder="templates")
-    api = Api(app)
-
-    # add resources
-    api.add_resource(Index, '/')
-    api.add_resource(Bulb, '/light/bulb')
 
     try:
 
@@ -26,6 +31,7 @@ if __name__ == '__main__':
             , metavar='hostname:port'
             , type=str
             , help="hostname and port number for the server in the format: <hostname>:<port>"
+            , nargs="?"
         )
 
         parser.add_argument(
@@ -35,9 +41,7 @@ if __name__ == '__main__':
         )
 
         args = parser.parse_args()
-        
-        print(args)
-        
+                
         if args.hostname:
             hostname = args.hostname.split(":")
             host = hostname[0]
@@ -45,12 +49,8 @@ if __name__ == '__main__':
         else:
             sys.exit(-1)
 
-        app.config['EXPLAIN_TEMPLATE_LOADING'] = True
-        
-        app.run(host=host, port=port, debug=args.debug)
-
     except (KeyboardInterrupt, SystemExit):
         print("\nExiting...")
 
-else:
-    sys.exit()
+    app.run(host=host, port=port, debug=args.debug)
+

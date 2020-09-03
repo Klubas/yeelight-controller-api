@@ -31,19 +31,19 @@ class LightController:
         if bulb_name:
             for bulb in self.bulbs: # refatorar pra receber uma lista?
                 if bulb['name'] == bulb_name:
-                    bulb['bulb'].turn_on()
+                    return bulb['bulb'].turn_on()
         else:
             for bulb in self.bulbs:
-                bulb['bulb'].turn_on()
+                return bulb['bulb'].turn_on()
 
     def turn_off(self, bulb_name=None):
         if bulb_name:
             for bulb in self.bulbs: # refatorar pra receber uma lista?
                 if bulb['name'] == bulb_name:
-                    bulb['bulb'].turn_off()
+                    return bulb['bulb'].turn_off()
         else:
             for bulb in self.bulbs:
-                bulb['bulb'].turn_off()
+                return bulb['bulb'].turn_off()
 
     def set_bulb_color(self, color=(255, 255, 255), bulb_name=None):
         if bulb_name:
@@ -99,10 +99,10 @@ class LightController:
     def run_action(self, name=None, action=None, params=None):
 
         if action == 'on':
-            self.turn_on(bulb_name=name)
+            return self.turn_on(bulb_name=name)
 
         elif action == 'off':
-            self.turn_off(bulb_name=name)
+            return self.turn_off(bulb_name=name)
 
         elif action == 'color':
 
