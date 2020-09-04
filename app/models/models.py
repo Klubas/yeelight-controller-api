@@ -62,9 +62,13 @@ class BulbController:
 
             bulbs = self.get_bulbs(ip=ip, name=name)
 
-            if len(bulbs) > 0:
+            print(bulbs)
+
+            if len(bulbs) > 1:
                 raise Exception("Multiple bulbs found for the specified arguments: Name={} ip={}"
                                 .format(name, ip))
+            elif len(bulbs) == 0:
+                raise Exception("No bulb found for <{}>".format(ip if ip else name))
             else:
                 return bulbs[0]
 

@@ -45,19 +45,19 @@ class Power(Resource):
         If bulb <name> received will loop through all bulbs.
         :return:
         """
-        print("oi")
         parser = reqparse.RequestParser()
         parser.add_argument('ip', type=str, required=True, help='Bulb IP Adress')
         parser.add_argument('state', type=str, required=True, help='New power state')
         args = parser.parse_args()
 
-        print(args)
-
         bulb_ip = args['ip']
         state = args['state']
 
-        status = bulbs.power(bulb_ip=bulb_ip, state=state)
-        return {'Response': str(status)}, 200
+        try:
+            status = bulbs.power(bulb_ip=bulb_ip, state=state)
+            return {'Response': str(status)}, 200
+        except Exception as e:
+            return {'Response': str(e)}, 500
 
     @staticmethod
     def get():
