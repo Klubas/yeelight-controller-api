@@ -22,7 +22,7 @@ class BulbController:
 
         return bulbs
 
-    def get_bulbs(self, ip=None, name=None, model=None) -> list:
+    def get_bulbs(self, ip=None, name=None, model=None, return_metadata=False) -> list:
         """
         Get a list of bulbs by ip, name or model
         :param ip:
@@ -47,7 +47,7 @@ class BulbController:
 
         for bulb in self.bulbs:
             if bulb[param] == value or return_all:
-                bulbs.append(bulb['bulb'])
+                bulbs.append(bulb if return_metadata else bulb['bulb'])
         return bulbs
 
     def get_bulb(self, ip=None, name=None) -> Bulb:
@@ -71,7 +71,7 @@ class BulbController:
         else:
             raise Exception("You must specify a name or ip address.")
 
-    def power(self, bulb_ip, bulb_name, state='on') -> bool:
+    def power(self, bulb_ip=None, bulb_name=None, state='on') -> bool:
         """
         Switch bulb power state to <state>
         :param bulb_ip:
@@ -79,6 +79,7 @@ class BulbController:
         :param state:
         :return:
         """
+
         bulb = self.get_bulb(ip=bulb_ip, name=bulb_name)
 
         try:
@@ -100,7 +101,7 @@ class BulbController:
         :param color_type:
         :return:
         """
-        pass
+        return False
 
     def rename_bulb(self, ip, new_name) -> bool:
         """
@@ -109,7 +110,18 @@ class BulbController:
         :param new_name:
         :return:
         """
-        pass
+        if not ip and not new_name:
+            raise Exception("Parameters <ip> and <new_name> must be especified.")
+
+        bulb = self.get_bulb(ip=ip)
+
+        try:
+            bulb.set_name(name=new_name)
+            self.sync_bulbs()
+            return True
+
+        except Exception as e:
+            return False
 
     def sync_bulbs(self) -> None:
         """
@@ -123,11 +135,6 @@ class BulbController:
             ip = bulb['ip']
             port = bulb['port']
             model = bulb['capabilities']['model']
-            state = bulb['capabilities']['power']
-            bright = bulb['capabilities']['bright']
-            sat = bulb['capabilities']['sat']
-            hue = bulb['capabilities']['hue']
-            rgb = bulb['capabilities']['rgb']
             name = bulb['capabilities']['name']
             name = name if name != '' else model
             identifier = bulb['capabilities']['id']
@@ -139,17 +146,14 @@ class BulbController:
             )
 
             found_bulb.set_name(name)
+            properties = found_bulb.get_properties()
 
             bulbs.append({
                     'bulb': found_bulb
                     , 'name': name
                     , 'model': model
                     , 'ip': ip
-                    , 'state': state
-                    , 'bright': bright
-                    , 'hue': hue
-                    , 'sat': sat
-                    , 'rgb': rgb
+                    , 'properties': properties
                     , 'id': identifier
                 }
             )

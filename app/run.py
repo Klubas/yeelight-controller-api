@@ -11,13 +11,9 @@ api = Api(app)
 
 # add resources
 api.add_resource(Index, '/')
-api.add_resource(Bulbs, '/bulbs')
-api.add_resource(Power, '/bulbs/power')
-api.add_resource(Color, '/bulbs/color')
-
-### OLD
-from .views.views import Bulb
-api.add_resource(Bulb, '/light/bulb')
+api.add_resource(Bulbs, '/api/bulbs')
+api.add_resource(Power, '/api/bulbs/power')
+api.add_resource(Color, '/api/bulbs/color')
 
 app.config['EXPLAIN_TEMPLATE_LOADING'] = True
 

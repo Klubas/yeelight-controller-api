@@ -2,7 +2,7 @@ import os
 import logging
 import json
 from flask import request
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
 from flask import render_template, make_response
 from app.models.models import BulbController
 
@@ -45,13 +45,18 @@ class Power(Resource):
         If bulb <name> received will loop through all bulbs.
         :return:
         """
-        payload = request.get_json(force=True) # payload must be a list of objects
+        print("oi")
+        parser = reqparse.RequestParser()
+        parser.add_argument('ip', type=str, required=True, help='Bulb IP Adress')
+        parser.add_argument('state', type=str, required=True, help='New power state')
+        args = parser.parse_args()
 
-        bulb_ip = payload['action'] if 'action' in payload else None
-        state = payload['params'] if 'params' in payload else None
+        print(args)
+
+        bulb_ip = args['ip']
+        state = args['state']
 
         status = bulbs.power(bulb_ip=bulb_ip, state=state)
-
         return {'Response': str(status)}, 200
 
     @staticmethod
@@ -61,7 +66,7 @@ class Power(Resource):
         On, Off, Null
         :return:
         """
-        return {'Response': "Not defined."}
+        return {'Response': "Not defined."}, 200
 
 
 class Color(Resource):
@@ -71,7 +76,7 @@ class Color(Resource):
         Change bulb current color by ip
         :return:
         """
-        return {'Response': "Not defined."}
+        return {'Response': "Not defined."}, 200
 
     @staticmethod
     def get():
@@ -79,32 +84,4 @@ class Color(Resource):
         get bulb current color by ip
         :return:
         """
-        return {'Response': "Not defined."}
-
-"""
-OLD Methods
-"""
-from app.models.modelsOLD import BulbController as BulbControllerOLD
-
-lights = BulbControllerOLD()
-bulb_names = lights.get_bulb_names()
-
-
-class Bulb(Resource):
-    @staticmethod
-    def post():
-        payload = request.get_json(force=True)
-
-        logging.debug(payload)
-
-        bulb_name = payload['name'] if 'name' in payload else None
-        action = payload['action'] if 'action' in payload else None
-        params = payload['params'] if 'params' in payload else None
-
-        status = lights.run_action(
-            name=bulb_name
-            , action=action
-            , params=params
-        )
-
-        return {'Response': status}, 200
+        return {'Response': "Not defined."}, 200
