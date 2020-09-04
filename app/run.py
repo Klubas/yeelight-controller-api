@@ -4,19 +4,25 @@ import argparse
 
 from flask import Flask
 from flask_restful import Api
-from .views.views import Index, Bulb
+from .views.views import Index, Power, Bulbs, Color
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 api = Api(app)
 
 # add resources
 api.add_resource(Index, '/')
+api.add_resource(Bulbs, '/bulbs')
+api.add_resource(Power, '/bulbs/power')
+api.add_resource(Color, '/bulbs/color')
+
+### OLD
+from .views.views import Bulb
 api.add_resource(Bulb, '/light/bulb')
 
 app.config['EXPLAIN_TEMPLATE_LOADING'] = True
 
-host="0.0.0.0"
-port=5000
+host = "0.0.0.0"
+port = 5000
 
 if __name__ == '__main__':
 
