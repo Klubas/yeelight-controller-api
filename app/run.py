@@ -4,7 +4,7 @@ import argparse
 
 from flask import Flask
 from flask_restful import Api
-from .LightAPI import Index, Bulb
+from .views.views import Index, Bulb
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 api = Api(app)
@@ -49,8 +49,9 @@ if __name__ == '__main__':
         else:
             sys.exit(-1)
 
+        app.run(host=host, port=port, debug=args.debug)
+
     except (KeyboardInterrupt, SystemExit):
         print("\nExiting...")
 
-    app.run(host=host, port=port, debug=args.debug)
 

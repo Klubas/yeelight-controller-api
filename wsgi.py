@@ -2,7 +2,7 @@
 import sys
 import argparse
 
-from app.app import app
+from app.run import app
 
 
 if __name__ == "__main__":

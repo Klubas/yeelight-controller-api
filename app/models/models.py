@@ -2,16 +2,16 @@ import logging
 from yeelight import discover_bulbs, Bulb
 
 
-class LightController:
+class BulbController:
     def __init__(self):
         self.bulbs = list()
 
         for bulb in discover_bulbs():
 
             found_bulb = Bulb(
-                    ip=bulb['ip']
-                    , port=bulb['port']
-                    , model=bulb['capabilities']['model']
+                ip=bulb['ip']
+                , port=bulb['port']
+                , model=bulb['capabilities']['model']
             )
 
             if bulb['capabilities']['name'] == '':
@@ -21,15 +21,15 @@ class LightController:
             found_bulb.set_name(name)
 
             self.bulbs.append({
-                    'bulb': found_bulb
-                    , 'name': name
-                    , 'ip': bulb['ip']
-                }
+                'bulb': found_bulb
+                , 'name': name
+                , 'ip': bulb['ip']
+            }
             )
 
     def music_mode(self, bulb_name=None, start=False):
         if bulb_name is None:
-            logging.info('Ação não suportada')
+            logging.info('Unsuported action')
         else:
 
             bulb = self.get_bulb()
@@ -39,11 +39,10 @@ class LightController:
             else:
                 return bulb.stop_music()
 
-
     def turn_on(self, bulb_name=None):
         response = None
         if bulb_name:
-            for bulb in self.bulbs: # refatorar pra receber uma lista?
+            for bulb in self.bulbs:  # refatorar pra receber uma lista?
                 if bulb['name'] == bulb_name:
                     response = bulb['bulb'].turn_on()
         else:
@@ -54,7 +53,7 @@ class LightController:
     def turn_off(self, bulb_name=None):
         response = None
         if bulb_name:
-            for bulb in self.bulbs: # refatorar pra receber uma lista?
+            for bulb in self.bulbs:  # refatorar pra receber uma lista?
                 if bulb['name'] == bulb_name:
                     response = bulb['bulb'].turn_off()
         else:
@@ -90,9 +89,9 @@ class LightController:
             names.append(bulb['name'])
         return names
 
-    def get_bulb(self, bulb_name):
+    def get_bulb(self, bulb_name=None):
         if bulb_name:
-            for bulb in self.bulbs: # refatorar pra receber uma lista?
+            for bulb in self.bulbs:  # refatorar pra receber uma lista?
                 if bulb['name'] == bulb_name:
                     return bulb['bulb']
         else:
@@ -167,5 +166,3 @@ class LightController:
                 return
 
             return self.set_bulb_name(new_name=new_name, bulb_name=name)
-
-

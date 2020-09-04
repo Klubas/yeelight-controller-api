@@ -4,9 +4,9 @@ from flask import request
 from flask_restful import Resource
 from flask import render_template, make_response
 
-from .LightController import LightController
+from app.models.models import BulbController
 
-lights = LightController()
+lights = BulbController()
 bulb_names = lights.get_bulb_names()
 
 
@@ -14,8 +14,8 @@ class Index(Resource):
     @staticmethod
     def get():
         headers = {
-        	'Content-Type': 'text/html',
-        	'Access-Control-Allow-Origin': '*'
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin': '*'
         }
 
         html = os.path.join('index.html')
@@ -38,7 +38,5 @@ class Bulb(Resource):
             , action=action
             , params=params
         )
-
-        print(status)
 
         return {'Response': status}, 200
