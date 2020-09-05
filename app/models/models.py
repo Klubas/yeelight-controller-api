@@ -5,7 +5,7 @@ from yeelight import discover_bulbs, Bulb, LightType
 class BulbController:
     def __init__(self):
         self.bulbs = list()
-        self.sync_bulbs()
+        self.__sync_bulbs__()
 
     def get_bulbs(self, ip=None, name=None, model=None, metadata=False) -> list:
         """
@@ -149,13 +149,13 @@ class BulbController:
 
         try:
             bulb.set_name(name=new_name)
-            self.sync_bulbs()
+            self.__sync_bulbs__()
             return True
 
         except Exception as e:
             raise Exception(str(e))
 
-    def sync_bulbs(self) -> None:
+    def __sync_bulbs__(self) -> None:
         """
         Discover bulbs in local network and saves in a list
         """

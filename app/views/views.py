@@ -29,7 +29,7 @@ class Bulbs(Resource):
         :return:
         """
         try:
-            bulbs.sync_bulbs()
+            bulbs.__sync_bulbs__()
             response = bulbs.get_bulbs(metadata=True)
             response = json.dumps(str(response))
         except Exception as e:
