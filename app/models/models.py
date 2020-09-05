@@ -1,4 +1,3 @@
-import logging
 from yeelight import discover_bulbs, Bulb, LightType
 
 

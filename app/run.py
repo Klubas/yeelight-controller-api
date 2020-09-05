@@ -4,7 +4,7 @@ import argparse
 
 from flask import Flask
 from flask_restful import Api
-from .views.views import Index, Power, Bulbs, Color
+from .views.views import Index, Power, Bulbs, Bulb, Color
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 api = Api(app)
@@ -12,6 +12,7 @@ api = Api(app)
 # add resources
 api.add_resource(Index, '/')
 api.add_resource(Bulbs, '/api/bulbs')
+api.add_resource(Bulb,  '/api/bulb')
 api.add_resource(Power, '/api/bulb/power')
 api.add_resource(Color, '/api/bulb/color')
 

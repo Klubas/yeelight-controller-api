@@ -1,5 +1,4 @@
 import os
-import logging
 import json
 from flask import request
 from flask_restful import Resource, reqparse
@@ -37,6 +36,36 @@ class Bulbs(Resource):
         return {'Response': response}, 200
 
 
+class Bulb(Resource):
+    @staticmethod
+    def get():
+        """
+        Get bulb metadata by ip
+        :return:
+        """
+        try:
+
+            parser = reqparse.RequestParser()
+            parser.add_argument('ip', type=str, required=True, help='Bulb IP Adress')
+            args = parser.parse_args()
+
+            bulb_ip = args.ip
+
+            response = bulbs.get_bulbs(ip=bulb_ip, metadata=True)
+            response = json.dumps(str(response))
+        except Exception as e:
+            return {'Response': str(e)}, 500
+        return {'Response': response}, 200
+
+    @staticmethod
+    def put():
+        """
+        Update bulb name
+        :return:
+        """
+        return {'Response': "Not defined."}, 200
+
+
 class Power(Resource):
     @staticmethod
     def post():
@@ -52,8 +81,8 @@ class Power(Resource):
             parser.add_argument('state', type=str, required=False, help='New power state. Toggle if not supplied.')
             args = parser.parse_args()
 
-            bulb_ip = args['ip']
-            state = args['state'] if args['state'] else 'toggle'
+            bulb_ip = args.ip
+            state = args.state if args.state else 'toggle'
             status = bulbs.power(ip=bulb_ip, state=state)
 
             return {'Response': str(status)}, 200
@@ -79,12 +108,12 @@ class Color(Resource):
         :return:
         """
         try:
-            payload = request.get_json(force=True)
             parser = reqparse.RequestParser()
             parser.add_argument('ip', type=str, required=True, help='Bulb IP Adress')
             args = parser.parse_args()
+            bulb_ip = args.ip
 
-            bulb_ip = args['ip']
+            payload = request.get_json(force=True)
             color_mode = payload['mode'] if 'mode' in payload else None
 
             if not type:
