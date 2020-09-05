@@ -12,8 +12,8 @@ api = Api(app)
 # add resources
 api.add_resource(Index, '/')
 api.add_resource(Bulbs, '/api/bulbs')
-api.add_resource(Power, '/api/bulbs/power')
-api.add_resource(Color, '/api/bulbs/color')
+api.add_resource(Power, '/api/bulb/power')
+api.add_resource(Color, '/api/bulb/color')
 
 app.config['EXPLAIN_TEMPLATE_LOADING'] = True
 
