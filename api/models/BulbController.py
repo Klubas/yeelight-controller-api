@@ -1,5 +1,5 @@
 import ipaddress
-import logging, traceback
+import logging
 from yeelight import discover_bulbs, Bulb, LightType
 
 
@@ -200,6 +200,6 @@ class BulbController:
                     , 'properties': properties
                 }
             }
-            )
+        )
 
         self.bulbs = bulbs
