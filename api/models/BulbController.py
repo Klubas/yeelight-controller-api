@@ -1,3 +1,5 @@
+import ipaddress
+import logging, traceback
 from yeelight import discover_bulbs, Bulb, LightType
 
 
@@ -29,10 +31,12 @@ class BulbController:
             value = model
         elif not ip:
             return_all = True
+        elif ip:
+            ipaddress.ip_address(str(ip))
 
         for bulb in self.bulbs:
             if bulb[param] == value or return_all:
-                bulbs.append(bulb if metadata else bulb['bulb'])
+                bulbs.append(bulb['metadata'] if metadata else bulb['bulb'])
         return bulbs
 
     def get_bulb(self, ip=None) -> Bulb:
@@ -73,11 +77,11 @@ class BulbController:
         bulb = self.get_bulb(ip=ip)
 
         try:
-            if state == states[0]:      # on
+            if state == states[0]:  # on
                 bulb.turn_on()
-            elif state == states[1]:    # off
+            elif state == states[1]:  # off
                 bulb.turn_off()
-            else:                       # toggle
+            else:  # toggle
                 bulb.toggle()
 
         except Exception as e:
@@ -167,12 +171,11 @@ class BulbController:
             raise Exception(str(e))
 
         for bulb in discovered_bulbs:
-
             ip = bulb['ip']
             port = bulb['port']
             model = bulb['capabilities']['model']
             name = bulb['capabilities']['name']
-            name = name if name != '' else model
+            name = name if name != '' else ip
             identifier = bulb['capabilities']['id']
 
             found_bulb = Bulb(
@@ -185,13 +188,18 @@ class BulbController:
             properties = found_bulb.get_properties()
 
             bulbs.append({
-                    'bulb': found_bulb
+                'bulb': found_bulb
+                , 'name': name
+                , 'model': model
+                , 'ip': ip
+                , 'metadata': {
+                    'id': identifier
+                    , 'ip': ip
                     , 'name': name
                     , 'model': model
-                    , 'ip': ip
                     , 'properties': properties
-                    , 'id': identifier
                 }
+            }
             )
 
         self.bulbs = bulbs

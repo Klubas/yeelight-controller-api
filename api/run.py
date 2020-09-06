@@ -4,7 +4,7 @@ import argparse
 
 from flask import Flask
 from flask_restful import Api
-from .views.views import Index, Power, Bulbs, Bulb, Color
+from .views.Views import Index, Power, Bulbs, Bulb, Color
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 api = Api(app)
