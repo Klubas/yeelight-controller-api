@@ -7,6 +7,7 @@ class APIStatusMessage(Enum):
     IP_REQUIRED = "Param IP is required for this action.", 400
     IP_INVALID = "Supplied IP is invalid.", 400
     REQUIRED_ARG = "Argument '{}' must be specified. Details: [{}]", 400
+    VALUE_ERROR = "Value '{}' for '{}' is invalid", 400
     SUCCESS = "Operation performed successfully", 200
     ERROR = "Internal server error.", 500
     METHOD_NOT_DEFINED = "Not defined", 501

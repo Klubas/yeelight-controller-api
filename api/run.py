@@ -16,7 +16,7 @@ api.add_resource(Bulb,  '/api/bulb')
 api.add_resource(Power, '/api/bulb/power')
 api.add_resource(Color, '/api/bulb/color')
 
-app.config['EXPLAIN_TEMPLATE_LOADING'] = True
+app.config['EXPLAIN_TEMPLATE_LOADING'] = False
 
 host = "0.0.0.0"
 port = 5000

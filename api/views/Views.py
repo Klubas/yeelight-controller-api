@@ -53,13 +53,24 @@ class Bulb(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('ip', type=str, required=True,
                             help=APIStatusMessage.IP_REQUIRED.value[0])
+        parser.add_argument('property', type=str, required=False,
+                            help='Returns a bulb property')
         args = parser.parse_args()
 
         try:
+            bulbs.__sync_bulbs__()
             response = bulbs.get_bulbs(ip=args.ip, metadata=True)
             response = response[0]
-            return handler.return_success(status=response)
 
+            if args.property:
+                if args.property in response.keys():
+                    response = response[args.property]
+                elif args.property in response['properties'].keys():
+                    response = response['properties'][args.property]
+                else:
+                    raise Exception(APIStatusMessage.VALUE_ERROR.value[0].format(
+                        args.property, 'property'))
+            return handler.return_success(status={args.property: response})
         except Exception as e:
             logging.exception(APIStatusMessage.ERROR.value[0])
             return handler.return_exception(
@@ -127,19 +138,6 @@ class Power(Resource):
                 traceback=traceback.format_exc(),
                 exception=e)
 
-    @staticmethod
-    def get():
-        """
-        get bulb power current state
-        On, Off, Null
-        :return:
-        """
-
-        return handler.return_exception(
-            status=APIStatusMessage.METHOD_NOT_DEFINED,
-            params=None
-        )
-
 
 class Color(Resource):
     @staticmethod
@@ -174,14 +172,3 @@ class Color(Resource):
                 traceback=traceback.format_exc(),
                 exception=e
             )
-
-    @staticmethod
-    def get():
-        """
-        get bulb current color by ip
-        :return:
-        """
-        return handler.return_exception(
-            status=APIStatusMessage.METHOD_NOT_DEFINED,
-            params=None
-        )
