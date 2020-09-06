@@ -1,7 +1,7 @@
 import os
 import logging, traceback
 from flask_restful import Resource, reqparse
-from flask import render_template, make_response
+from flask import render_template, make_response, request
 from api.models.BulbController import BulbController
 from api.views.ResponseHandler import ResponseHandler, APIStatusMessage
 
@@ -65,6 +65,7 @@ class Bulb(Resource):
             return handler.return_exception(
                 status=APIStatusMessage.ERROR,
                 params=args,
+                traceback=traceback.format_exc(),
                 exception=e
             )
 
@@ -121,7 +122,10 @@ class Power(Resource):
         except Exception as e:
             logging.exception(APIStatusMessage.ERROR.value[0])
             return handler.return_exception(
-                    status=APIStatusMessage.ERROR, params=args, exception=e)
+                status=APIStatusMessage.ERROR,
+                params=args,
+                traceback=traceback.format_exc(),
+                exception=e)
 
     @staticmethod
     def get():
@@ -144,7 +148,8 @@ class Color(Resource):
         Change bulb current color by ip
         :return:
         """
-        #payload = request.get_json(force=True)
+        payload = request.get_json(force=False)
+        print(payload)
         #color_mode = payload['mode'] if 'mode' in payload else None
         #values = payload['values'] if 'values' in payload else None
 
@@ -153,24 +158,25 @@ class Color(Resource):
         parser.add_argument('ip', type=str, required=True,
                             help=APIStatusMessage.IP_REQUIRED.value[0])
 
-        parser.add_argument('mode', type=str, required=True, location='json',
+        parser.add_argument('mode', dest='color_mode', type=str, required=True, location=['json', 'values'],
                             help=APIStatusMessage.REQUIRED_ARG.value[0]
                             .format('mode', 'rgb, hsv, bright, temp'))
 
-        parser.add_argument('values', type=list, required=True, location='json',
+        parser.add_argument('values', dest='color_values', action='append', type=int, required=True, location=['json', 'values'],
                             help=APIStatusMessage.REQUIRED_ARG.value[0]
                             .format('values', '[<int>, [int], [int]]'))
 
         args = parser.parse_args()
 
         try:
-            status = bulbs.change_color(ip=args.ip, values=tuple(args.values), color_mode=args.color_mode)
+            status = bulbs.change_color(ip=args.ip, values=tuple(args.color_values), color_mode=args.color_mode)
             return handler.return_success(status=status)
         except Exception as e:
             logging.exception(APIStatusMessage.ERROR.value[0])
             handler.return_exception(
                 status=APIStatusMessage.ERROR,
                 params=args,
+                traceback=traceback.format_exc(),
                 exception=e
             )
 

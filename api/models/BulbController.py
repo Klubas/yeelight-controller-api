@@ -116,7 +116,10 @@ class BulbController:
             red = values[0]
             green = values[1]
             blue = values[2]
-            bulb.set_rgb(red, green, blue)
+            try:
+                bulb.set_rgb(red, green, blue)
+            except Exception as e:
+                raise e
         elif color_mode == modes[1]:
             if len(values) > 3 or len(values) < 2:
                 raise Exception("HSV mode needs 2 or 3 values. [{}]".format(values))
