@@ -148,11 +148,6 @@ class Color(Resource):
         Change bulb current color by ip
         :return:
         """
-        payload = request.get_json(force=False)
-        print(payload)
-        #color_mode = payload['mode'] if 'mode' in payload else None
-        #values = payload['values'] if 'values' in payload else None
-
         parser = reqparse.RequestParser()
 
         parser.add_argument('ip', type=str, required=True,
