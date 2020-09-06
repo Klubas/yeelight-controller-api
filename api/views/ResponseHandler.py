@@ -3,52 +3,81 @@ from enum import Enum
 tb = True
 
 
-class APIStatusMessage(Enum):
-    IP_REQUIRED = "Param IP is required for this action.", 400
-    IP_INVALID = "Supplied IP is invalid.", 400
-    REQUIRED_ARG = "Argument '{}' must be specified. Details: [{}]", 400
-    VALUE_ERROR = "Value '{}' for '{}' is invalid", 400
-    SUCCESS = "Operation performed successfully", 200
-    ERROR = "Internal server error.", 500
-    METHOD_NOT_DEFINED = "Not defined", 501
+class APIMessage(Enum):
+    VALUE_ERROR_ARG = \
+        {"message": "Value '{}' for '{}' is invalid", "code": 400}
+
+    REQUIRED_ARG = \
+        {"message": "Argument '{}' must be specified. Details: [{}]", "code": 400}
+
+
+class APIStatus(Enum):
+    IP_REQUIRED = \
+        {"message": "Param IP is required for this action.", "code": 400}
+
+    IP_INVALID = \
+        {"message": "Supplied IP is invalid.", "code": 400}
+
+    BULB_NOT_FOUND = \
+        {"message": "Bulb not found.", "code": 400}
+
+    VALUE_ERROR = \
+        {"message": "Supplied value is invalid:", "code": 400}
+
+    SUCCESS = \
+        {"message": "Operation performed successfully", "code": 200}
+
+    ERROR = \
+        {"message": "Internal server error.", "code": 500}
+
+    METHOD_NOT_DEFINED = \
+        {"message": "Not defined", "code": 501}
 
 
 class ResponseHandler:
     @staticmethod
-    def return_exception(status, params, exception=None, traceback=None):
+    def exception(status, params, exception=None, traceback=None, **kwargs):
         """
         Used for returning exception messages via API
         :return:
         """
+
+        description = status.value.get('message')
+
         response = {
             'message': {
-                "status": status.value[0]
+                "status": status.name,
+                "description": description
             }
         }
 
         if exception:
             response['message']['response'] = str(exception)
 
-        if traceback and tb:
-            response['message']['traceback'] = str(traceback)
-
         if params:
             response['message']['params'] = params
 
-        return_code = status.value[1]
+        if traceback and tb:
+            response['message']['traceback'] = str(traceback)
+
+        return_code = status.value.get('code')
         return response, return_code
 
     @staticmethod
-    def return_success(status, message=APIStatusMessage.SUCCESS) -> dict and int:
+    def success(response, status=APIStatus.SUCCESS, **kwargs) -> dict and int:
         """
         Retorno de sucesso
         :return:
         """
-        status = {
+
+        description = status.value.get('message')
+
+        response = {
             'message': {
-                "status": message.value[0],
-                'response': status
+                "status": status.name,
+                "description": description,
+                'response': response
             }
         }
-        return_code = message.value[1]
-        return status, return_code
+        return_code = status.value.get('code')
+        return response, return_code

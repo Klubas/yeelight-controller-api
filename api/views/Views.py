@@ -1,9 +1,9 @@
 import os
 import logging, traceback
 from flask_restful import Resource, reqparse
-from flask import render_template, make_response, request
+from flask import render_template, make_response
 from api.models.BulbController import BulbController
-from api.views.ResponseHandler import ResponseHandler, APIStatusMessage
+from api.views.ResponseHandler import ResponseHandler, APIStatus, APIMessage
 
 handler = ResponseHandler()
 bulbs = BulbController()
@@ -32,11 +32,11 @@ class Bulbs(Resource):
         try:
             bulbs.__sync_bulbs__()
             response = bulbs.get_bulbs(metadata=True)
-            return handler.return_success(status=response)
+            return handler.success(response=response)
         except Exception as e:
-            logging.exception(APIStatusMessage.ERROR.value[0])
-            return handler.return_exception(
-                status=APIStatusMessage.ERROR,
+            logging.exception(APIStatus.ERROR.value.get('message'))
+            return handler.exception(
+                status=APIStatus.ERROR,
                 exception=e,
                 traceback=traceback.format_exc(),
                 params=None
@@ -50,9 +50,10 @@ class Bulb(Resource):
         Get bulb metadata by ip
         :return:
         """
+        return_status = APIStatus.ERROR
         parser = reqparse.RequestParser()
         parser.add_argument('ip', type=str, required=True,
-                            help=APIStatusMessage.IP_REQUIRED.value[0])
+                            help=APIStatus.IP_REQUIRED.value.get('message'))
         parser.add_argument('property', type=str, required=False,
                             help='Returns a bulb property')
         args = parser.parse_args()
@@ -60,7 +61,12 @@ class Bulb(Resource):
         try:
             bulbs.__sync_bulbs__()
             response = bulbs.get_bulbs(ip=args.ip, metadata=True)
-            response = response[0]
+
+            if len(response) > 0:
+                response = response[0]
+            else:
+                return_status = APIStatus.BULB_NOT_FOUND
+                raise Exception("Bulb {} was not found in the network.".format(args.ip))
 
             if args.property:
                 if args.property in response.keys():
@@ -68,13 +74,13 @@ class Bulb(Resource):
                 elif args.property in response['properties'].keys():
                     response = response['properties'][args.property]
                 else:
-                    raise Exception(APIStatusMessage.VALUE_ERROR.value[0].format(
-                        args.property, 'property'))
-            return handler.return_success(status={args.property: response})
+                    return_status = APIStatus.VALUE_ERROR
+                    raise Exception(APIMessage.VALUE_ERROR_ARG.value.get('message').format(args.property, 'property'))
+            return handler.success(response={args.property: response})
         except Exception as e:
-            logging.exception(APIStatusMessage.ERROR.value[0])
-            return handler.return_exception(
-                status=APIStatusMessage.ERROR,
+            logging.exception(return_status.value.get('message'))
+            return handler.exception(
+                status=return_status,
                 params=args,
                 traceback=traceback.format_exc(),
                 exception=e
@@ -86,22 +92,22 @@ class Bulb(Resource):
         Update bulb name
         :return:
         """
-
+        return_status = APIStatus.ERROR
         parser = reqparse.RequestParser()
         parser.add_argument('ip', type=str, required=True,
-                            help=APIStatusMessage.IP_REQUIRED.value[0])
+                            help=APIStatus.IP_REQUIRED.value.get('message'))
         parser.add_argument('new_name', type=str, required=True,
-                            help=APIStatusMessage.REQUIRED_ARG.value[0]
+                            help=APIMessage.REQUIRED_ARG.value.get('message')
                             .format('new_name', None))
         args = parser.parse_args()
 
         try:
             status = bulbs.rename_bulb(ip=args.ip, new_name=args.new_name)
-            return handler.return_success(status=status)
+            return handler.success(response=status)
         except Exception as e:
-            logging.exception(APIStatusMessage.ERROR.value[0])
-            return handler.return_exception(
-                status=APIStatusMessage.ERROR,
+            logging.exception(APIStatus.ERROR.value.get('message'))
+            return handler.exception(
+                status=return_status,
                 exception=e,
                 traceback=traceback.format_exc(),
                 params=args
@@ -118,9 +124,9 @@ class Power(Resource):
         """
         parser = reqparse.RequestParser()
         parser.add_argument('ip', type=str, required=True,
-                            help=APIStatusMessage.IP_REQUIRED.value[0])
+                            help=APIStatus.IP_REQUIRED.value.get('message'))
         parser.add_argument('state', type=str, required=False,
-                            help=APIStatusMessage.IP_REQUIRED.value[0]
+                            help=APIMessage.REQUIRED_ARG.value.get('message')
                             .format('state', 'on, off, toggle'))
 
         args = parser.parse_args()
@@ -129,11 +135,11 @@ class Power(Resource):
 
         try:
             status = bulbs.power(ip=args.ip, state=args.state)
-            return handler.return_success(status=status)
+            return handler.success(response=status)
         except Exception as e:
-            logging.exception(APIStatusMessage.ERROR.value[0])
-            return handler.return_exception(
-                status=APIStatusMessage.ERROR,
+            logging.exception(APIStatus.ERROR.value.get('message'))
+            return handler.exception(
+                status=APIStatus.ERROR,
                 params=args,
                 traceback=traceback.format_exc(),
                 exception=e)
@@ -149,25 +155,25 @@ class Color(Resource):
         parser = reqparse.RequestParser()
 
         parser.add_argument('ip', type=str, required=True,
-                            help=APIStatusMessage.IP_REQUIRED.value[0])
+                            help=APIStatus.IP_REQUIRED.value.get('message'))
 
         parser.add_argument('mode', dest='color_mode', type=str, required=True, location=['json', 'values'],
-                            help=APIStatusMessage.REQUIRED_ARG.value[0]
+                            help=APIMessage.REQUIRED_ARG.value.get('message')
                             .format('mode', 'rgb, hsv, bright, temp'))
 
         parser.add_argument('values', dest='color_values', action='append', type=int, required=True, location=['json', 'values'],
-                            help=APIStatusMessage.REQUIRED_ARG.value[0]
+                            help=APIMessage.REQUIRED_ARG.value.get('message')
                             .format('values', '[<int>, [int], [int]]'))
 
         args = parser.parse_args()
 
         try:
             status = bulbs.change_color(ip=args.ip, values=tuple(args.color_values), color_mode=args.color_mode)
-            return handler.return_success(status=status)
+            return handler.success(response=status)
         except Exception as e:
-            logging.exception(APIStatusMessage.ERROR.value[0])
-            handler.return_exception(
-                status=APIStatusMessage.ERROR,
+            logging.exception(APIStatus.ERROR.value.get('message'))
+            return handler.exception(
+                status=APIStatus.ERROR,
                 params=args,
                 traceback=traceback.format_exc(),
                 exception=e

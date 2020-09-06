@@ -110,36 +110,42 @@ class BulbController:
 
         bulb = self.get_bulb(ip=ip)
 
-        if color_mode == modes[0]:
-            if len(values) != 3:
-                raise Exception("RGB mode needs exactly 3 values. [{}]".format(values))
-            red = values[0]
-            green = values[1]
-            blue = values[2]
-            try:
-                bulb.set_rgb(red, green, blue)
-            except Exception as e:
-                raise e
-        elif color_mode == modes[1]:
-            if len(values) > 3 or len(values) < 2:
-                raise Exception("HSV mode needs 2 or 3 values. [{}]".format(values))
-            hue = values[0]
-            sat = values[1]
-            val = values[2]
-            bulb.set_hsv(hue, sat, val)
-        elif color_mode == modes[2]:
-            if len(values) > 2 or len(values) < 1:
-                raise Exception("BRIGHT mode needs 1 or 2 values. [{}]".format(values))
-            bright = values[0]
-            ambient = values[1] if values[1] else False
-            light_type = LightType.Ambient if ambient > 0 else LightType.Main
-            bulb.set_brightness(bright, light_type=light_type)
-        elif color_mode == modes[3]:
-            if len(values) != 1:
-                raise Exception("TEMP mode needs exactly 1 value. [{}]".format(values))
-            temp = values[0]
-            bulb.set_color_temp(temp)
-        return True
+        try:
+            if bulb:
+                if color_mode == modes[0]:
+                    if len(values) != 3:
+                        raise Exception("RGB mode needs exactly 3 values. [{}]".format(values))
+                    red = values[0]
+                    green = values[1]
+                    blue = values[2]
+                    try:
+                        bulb.set_rgb(red, green, blue)
+                    except Exception as e:
+                        raise e
+                elif color_mode == modes[1]:
+                    if len(values) > 3 or len(values) < 2:
+                        raise Exception("HSV mode needs 2 or 3 values. [{}]".format(values))
+                    hue = values[0]
+                    sat = values[1]
+                    val = values[2]
+                    bulb.set_hsv(hue, sat, val)
+                elif color_mode == modes[2]:
+                    if len(values) > 2 or len(values) < 1:
+                        raise Exception("BRIGHT mode needs 1 or 2 values. [{}]".format(values))
+                    bright = values[0]
+                    ambient = values[1] if values[1] else False
+                    light_type = LightType.Ambient if ambient > 0 else LightType.Main
+                    bulb.set_brightness(bright, light_type=light_type)
+                elif color_mode == modes[3]:
+                    if len(values) != 1:
+                        raise Exception("TEMP mode needs exactly 1 value. [{}]".format(values))
+                    temp = values[0]
+                    bulb.set_color_temp(temp)
+                return True
+            else:
+                return False
+        except Exception as e:
+            raise Exception(str(e))
 
     def rename_bulb(self, ip, new_name) -> bool:
         """
