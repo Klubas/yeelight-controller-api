@@ -1,25 +1,34 @@
 #!/usr/bin/env python3
 import sys
 import argparse
-
 from flask import Flask
 from flask_restful import Api
-from .views.Views import Index, Power, Bulbs, Bulb, Color
+
+from api.views.Index import Index
+from api.views.Bulbs import Bulbs
+from api.views.Bulb import Bulb
+from api.views.Power import Power
+from api.views.Color import Color
+
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
+
+# configs
+app.config['EXPLAIN_TEMPLATE_LOADING'] = False
+app.config['BUNDLE_ERRORS'] = True
+
 api = Api(app)
 
 # add resources
-api.add_resource(Index, '/')
+api.add_resource(Index, '/api')
 api.add_resource(Bulbs, '/api/bulbs')
 api.add_resource(Bulb,  '/api/bulb')
 api.add_resource(Power, '/api/bulb/power')
 api.add_resource(Color, '/api/bulb/color')
 
-app.config['EXPLAIN_TEMPLATE_LOADING'] = False
-
 host = "0.0.0.0"
 port = 5000
+
 
 if __name__ == '__main__':
 

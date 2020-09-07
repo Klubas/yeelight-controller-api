@@ -1,5 +1,4 @@
 import ipaddress
-import logging
 from yeelight import discover_bulbs, Bulb, LightType
 
 
@@ -212,3 +211,7 @@ class BulbController:
         )
 
         self.bulbs = bulbs
+
+
+bulbs = BulbController()
+
