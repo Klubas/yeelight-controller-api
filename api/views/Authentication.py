@@ -1,6 +1,6 @@
 import os
 import secrets
-from datetime import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from flask_restful import Resource
 from flask_httpauth import HTTPTokenAuth, HTTPBasicAuth
@@ -28,7 +28,11 @@ else:
 @auth.verify_token
 def verify_token(token):
     if token in tokens:
-        expiration_date = None if tokens[token][2] else None #implementar logica
+
+        expiration_date = \
+            tokens[token][2] + timedelta(days=3) if tokens[token][2] \
+            else None
+
         if expiration_date:
             return tokens[token][0]
         else:
@@ -44,8 +48,8 @@ def verify_password(username, password):
             token = item[0]
             break
     if token:
+        tokens.pop(token)
         new_token = secrets.token_hex(16)
-        tokens[new_token] = tokens.pop(token)
         tokens[new_token] = (username, password, datetime.now())
         return new_token
     else:
@@ -61,7 +65,6 @@ class Logon(Resource):
         Return token for specified user:password
         :return:
         """
-        print(login.current_user())
         if login.current_user() != '':
             return Handler.success(
                 response=login.current_user(),
