@@ -1,9 +1,6 @@
 FROM balenalib/raspberry-pi-alpine-python
 WORKDIR /usr/src/app
 COPY . .
-RUN /usr/local/bin/python3.8 -m pip install --upgrade pip
 RUN pip3 install wheel
 RUN pip3 install -r requirements.txt
-EXPOSE 80
-CMD ["gunicorn", "--bind", "0.0.0.0:80", "wsgi:app"]
-#CMD ["ping", "8.8.8.8"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "wsgi:app"]

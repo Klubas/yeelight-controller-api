@@ -15,14 +15,14 @@ login = HTTPBasicAuth()
 env_username = os.getenv('YC_USERNAME')
 env_password = os.getenv('YC_PWD')
 
-if env_username and env_password:
+if not env_username or not env_password:
+    raise Exception("Environment variables not set in .env\n{}".format('YC_USERNAME, YC_PWD'))
+else:
     env_password = generate_password_hash(env_password)
     tokens = {
         secrets.token_hex(16):
             (env_username, env_password, datetime.now())
-    }
-else:
-    raise Exception("Environment variables not set in .env\n{}".format('YC_USERNAME, YC_PWD'))
+}
 
 
 @auth.verify_token
@@ -46,11 +46,14 @@ def verify_password(username, password):
         if username == item[1][0] \
                 and check_password_hash(item[1][1], password):
             token = item[0]
+
             break
     if token:
-        tokens.pop(token)
         new_token = secrets.token_hex(16)
-        tokens[new_token] = (username, password, datetime.now())
+        tokens[new_token] = tokens.pop(token)
+        tokens[new_token] = (tokens[new_token][0],
+                             tokens[new_token][1],
+                             tokens[new_token][2])
         return new_token
     else:
         return ''

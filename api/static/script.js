@@ -1,6 +1,6 @@
 callEndpoint = async (actionValue, paramValue = null) => {
 
-    const url = currentLocation + '/light/bulb';
+    const url = currentLocation + '/api/bulb';
     const settings = {
         method: 'POST',
         headers: {
@@ -31,23 +31,13 @@ callEndpoint = async (actionValue, paramValue = null) => {
 function changeLampState(){
 	if(lampOn){
 		callEndpoint('off')
-		btnSwitch.setAttribute('value', 'Ligar')
+		btnSwitch.setAttribute('value', 'On')
 		lampOn = false
 	} else {
 		callEndpoint('on')
-		btnSwitch.setAttribute('value', 'Desligar')
+		btnSwitch.setAttribute('value', 'Off')
 		lampOn = true
 	}
-}
-
-function changeMusicMode(musicMode){
-    callEndpoint('music', musicMode)
-    if(musicMode){
-        btnMusicMode.setAttribute('value', 'Music Mode On')
-    } else {
-        btnMusicMode.setAttribute('value', 'Music Mode Off')
-    }
-    return musicMode
 }
 
 function changeLampColor(newColor){
@@ -69,7 +59,7 @@ function convertHexToRGB(hexColor) {
 
 const btnSwitch = document.getElementById('btnSwitch')
 var lampOn = true
-btnSwitch.setAttribute('value', 'Desligar')
+btnSwitch.setAttribute('value', 'Off')
 btnSwitch.addEventListener('click',
 	function(){changeLampState()}
 )
@@ -79,15 +69,6 @@ colorLightBulb.addEventListener('change',
     function(){
         var newColor = colorLightBulb.value
         changeLampColor(newColor)
-    }
-)
-
-var btnMusicMode = document.getElementById('btnMusicMode')
-var musicMode = false
-btnMusicMode.setAttribute('value', 'Music Mode Off')
-btnMusicMode.addEventListener('click',
-    function(){
-        musicMode = changeMusicMode(!musicMode)
     }
 )
 

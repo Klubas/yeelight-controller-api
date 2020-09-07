@@ -1,8 +1,6 @@
-FROM python:3
+FROM python:3.8-alpine
 WORKDIR /usr/src/app
 COPY . .
-# RUN /usr/local/bin/python3.8 -m pip install --upgrade pip
 RUN pip3 install wheel
 RUN pip3 install -r requirements.txt
-#EXPOSE 5000
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "wsgi:app"]

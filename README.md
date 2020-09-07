@@ -4,9 +4,15 @@ This repo contains the yeelight-controller-api.
 
 With it you can (theoretically, I just have one) view and control all yeelight bulbs in your network. 
 
-#### Start server:
+#### Start server locally:
     
     gunicorn --bind <hostname>:<port> wsgi:app
+    
+### Deploy to balena application
+
+    balena push <application-name>
+
+> make sure you are using the correct Dockerfiles    
 
 #### User credentials:
 
