@@ -6,8 +6,8 @@ from flask import Flask
 from flask_restful import Api
 
 from api.views.Index import Index
-from api.views.Bulbs import Bulbs
-from api.views.Bulb import Bulb
+from api.views.LightBulbs import LightBulbs
+from api.views.LightBulb import LightBulb
 from api.views.Power import Power
 from api.views.Color import Color
 from api.views.Authentication import Logon
@@ -27,8 +27,8 @@ api = Api(app)
 # add resources
 api.add_resource(Index, '/api')
 api.add_resource(Logon, '/api/logon')
-api.add_resource(Bulbs, '/api/bulbs')
-api.add_resource(Bulb,  '/api/bulb')
+api.add_resource(LightBulbs, '/api/bulbs')
+api.add_resource(LightBulb, '/api/bulb')
 api.add_resource(Power, '/api/bulb/power')
 api.add_resource(Color, '/api/bulb/color')
 

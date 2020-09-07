@@ -2,11 +2,11 @@ import logging
 import traceback
 from flask_restful import Resource, reqparse
 from api.models.ResponseHandler import ResponseHandler as Handler, APIStatus, APIMessage
-from api.models.BulbController import BulbController as bulbs
+from api.models.BulbController import BulbController as Bulbs
 from api.views.Authentication import auth
 
 
-class Bulb(Resource):
+class LightBulb(Resource):
     decorators = [auth.login_required]
 
     @staticmethod
@@ -24,7 +24,7 @@ class Bulb(Resource):
         args = parser.parse_args()
 
         try:
-            response = bulbs.get_bulbs(ip=args.ip, metadata=True)
+            response = Bulbs.get_bulbs(ip=args.ip, metadata=True)
 
             if len(response) > 0:
                 response = response[0]
@@ -66,7 +66,7 @@ class Bulb(Resource):
         args = parser.parse_args()
 
         try:
-            status = bulbs.rename_bulb(ip=args.ip, new_name=args.new_name)
+            status = Bulbs.rename_bulb(ip=args.ip, new_name=args.new_name)
             return Handler.success(response=status)
         except Exception as e:
             logging.exception(APIStatus.ERROR.value.get('message'))

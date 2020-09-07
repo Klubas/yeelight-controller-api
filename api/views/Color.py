@@ -2,7 +2,7 @@ import logging
 import traceback
 from flask_restful import Resource, reqparse
 from api.models.ResponseHandler import ResponseHandler as Handler, APIStatus, APIMessage
-from api.models.BulbController import BulbController as bulbs
+from api.models.BulbController import BulbController as Bulbs
 from api.views.Authentication import auth
 
 
@@ -31,7 +31,7 @@ class Color(Resource):
         args = parser.parse_args()
 
         try:
-            status = bulbs.change_color(ip=args.ip, values=tuple(args.color_values), color_mode=args.color_mode)
+            status = Bulbs.change_color(ip=args.ip, values=tuple(args.color_values), color_mode=args.color_mode)
             return Handler.success(response=status)
         except Exception as e:
             logging.exception(APIStatus.ERROR.value.get('message'))

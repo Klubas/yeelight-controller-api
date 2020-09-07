@@ -2,7 +2,7 @@ import logging
 import traceback
 from flask_restful import Resource, reqparse
 from api.models.ResponseHandler import ResponseHandler as Handler, APIStatus, APIMessage
-from api.models.BulbController import BulbController as bulbs
+from api.models.BulbController import BulbController as Bulbs
 from api.views.Authentication import auth
 
 
@@ -28,7 +28,7 @@ class Power(Resource):
         args.state = args.state if args.state else 'toggle'
 
         try:
-            status = bulbs.power(ip=args.ip, state=args.state)
+            status = Bulbs.power(ip=args.ip, state=args.state)
             return Handler.success(response=status)
         except Exception as e:
             logging.exception(APIStatus.ERROR.value.get('message'))
