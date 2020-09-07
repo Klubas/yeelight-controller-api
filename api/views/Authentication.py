@@ -4,13 +4,14 @@ from flask_httpauth import HTTPTokenAuth
 
 auth = HTTPTokenAuth(scheme='Bearer')
 
-tokens = {
-    os.getenv('TOKEN'): os.getenv('USER'),
-}
-
 
 @auth.verify_token
 def verify_token(token):
+    
+    tokens = {
+        os.getenv('YEELIGHT_TOKEN'): os.getenv('YEELIGHT_USERNAME'),
+    }
+
     if token in tokens:
         return tokens[token]
 
