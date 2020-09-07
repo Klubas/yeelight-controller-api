@@ -2,7 +2,7 @@ import logging
 import traceback
 from flask_restful import Resource, reqparse
 from api.models.ResponseHandler import ResponseHandler as Handler, APIStatus, APIMessage
-from api.models.BulbController import bulbs
+from api.models.BulbController import BulbController as bulbs
 from api.views.Authentication import auth
 
 

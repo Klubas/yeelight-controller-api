@@ -9,6 +9,7 @@ from api.views.Bulbs import Bulbs
 from api.views.Bulb import Bulb
 from api.views.Power import Power
 from api.views.Color import Color
+from api.views.Authentication import Logon
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -24,6 +25,7 @@ api = Api(app)
 
 # add resources
 api.add_resource(Index, '/api')
+api.add_resource(Logon, '/api/logon')
 api.add_resource(Bulbs, '/api/bulbs')
 api.add_resource(Bulb,  '/api/bulb')
 api.add_resource(Power, '/api/bulb/power')

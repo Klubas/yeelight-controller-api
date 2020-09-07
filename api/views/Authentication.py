@@ -7,7 +7,7 @@ auth = HTTPTokenAuth(scheme='Bearer')
 
 @auth.verify_token
 def verify_token(token):
-    
+
     tokens = {
         os.getenv('YEELIGHT_TOKEN'): os.getenv('YEELIGHT_USERNAME'),
     }
@@ -16,13 +16,22 @@ def verify_token(token):
         return tokens[token]
 
 
+class Logon(Resource):
+    def post(self):
+        """
+        Return token for specified user:password
+        :return:
+        """
+        pass
+
+
 class Token(Resource):
     decorators = [auth.login_required]
 
     @staticmethod
     def get():
         """
-        Return all tokens
+        Return tokens
         :return:
         """
         pass

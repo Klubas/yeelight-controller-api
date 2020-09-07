@@ -2,7 +2,7 @@ import logging
 import traceback
 from flask_restful import Resource, reqparse
 from api.models.ResponseHandler import ResponseHandler as Handler, APIStatus, APIMessage
-from api.models.BulbController import bulbs
+from api.models.BulbController import BulbController as bulbs
 from api.views.Authentication import auth
 
 
@@ -24,7 +24,6 @@ class Bulb(Resource):
         args = parser.parse_args()
 
         try:
-            bulbs.__sync_bulbs__()
             response = bulbs.get_bulbs(ip=args.ip, metadata=True)
 
             if len(response) > 0:
