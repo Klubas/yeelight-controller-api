@@ -10,6 +10,9 @@ from api.views.Bulb import Bulb
 from api.views.Power import Power
 from api.views.Color import Color
 
+from dotenv import load_dotenv
+load_dotenv()
+
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
