@@ -12,11 +12,17 @@ load_dotenv()
 auth = HTTPTokenAuth(scheme='Bearer')
 login = HTTPBasicAuth()
 
+env_username = os.getenv('YC_USERNAME')
+env_password = os.getenv('YC_PWD')
 
-tokens = {
-    secrets.token_hex(16):
-        (os.getenv('YC_USERNAME'), generate_password_hash(os.getenv('YC_PWD')), datetime.now())
-}
+if env_username and env_password:
+    env_password = generate_password_hash(env_password)
+    tokens = {
+        secrets.token_hex(16):
+            (env_username, env_password, datetime.now())
+    }
+else:
+    raise Exception("Environment variables not set in .env\n{}".format('YC_USERNAME, YC_PWD'))
 
 
 @auth.verify_token

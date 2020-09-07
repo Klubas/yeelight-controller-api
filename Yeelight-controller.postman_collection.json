@@ -1,0 +1,281 @@
+{
+	"info": {
+		"_postman_id": "43d9ba8e-fa2b-47b0-81f5-449a9936a442",
+		"name": "Yeelight-controller",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Logon",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3a37ff28-b17d-4205-8d03-e2102f170632",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"token\", jsonData.message.response);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "{{username}}",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{password}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://{{hostname}}:{{port}}/api/logon",
+					"protocol": "http",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"logon"
+					]
+				},
+				"description": "Change bulb power state (on/off/toggle)"
+			},
+			"response": []
+		},
+		{
+			"name": "Bulbs",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{hostname}}:{{port}}/api/bulbs",
+					"protocol": "http",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"bulbs"
+					]
+				},
+				"description": "Get all yeelight bulbs in the network"
+			},
+			"response": []
+		},
+		{
+			"name": "Bulb",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{hostname}}:{{port}}/api/bulb?ip={{bulb_ip}}&property=model",
+					"protocol": "http",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"bulb"
+					],
+					"query": [
+						{
+							"key": "ip",
+							"value": "{{bulb_ip}}"
+						},
+						{
+							"key": "property",
+							"value": "model"
+						}
+					]
+				},
+				"description": "Get an yeelight bulb metadata"
+			},
+			"response": []
+		},
+		{
+			"name": "Rename Bulb",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://{{hostname}}:{{port}}/api/bulb?ip={{bulb_ip}}&new_name=teste",
+					"protocol": "http",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"bulb"
+					],
+					"query": [
+						{
+							"key": "ip",
+							"value": "{{bulb_ip}}"
+						},
+						{
+							"key": "new_name",
+							"value": "teste"
+						}
+					]
+				},
+				"description": "Change a bulb name"
+			},
+			"response": []
+		},
+		{
+			"name": "Power Bulb",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://{{hostname}}:{{port}}/api/bulb/power?ip={{bulb_ip}}&state=toggle",
+					"protocol": "http",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"bulb",
+						"power"
+					],
+					"query": [
+						{
+							"key": "ip",
+							"value": "{{bulb_ip}}"
+						},
+						{
+							"key": "state",
+							"value": "toggle"
+						}
+					]
+				},
+				"description": "Change bulb power state (on/off/toggle)"
+			},
+			"response": []
+		},
+		{
+			"name": "Change Bulb Color",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"mode\": \"rgb\",\n    \"values\": [\n        255, 255, 255\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{hostname}}:{{port}}/api/bulb/color?ip={{bulb_ip}}",
+					"protocol": "http",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"bulb",
+						"color"
+					],
+					"query": [
+						{
+							"key": "ip",
+							"value": "{{bulb_ip}}"
+						},
+						{
+							"key": "mode",
+							"value": "rgb",
+							"disabled": true
+						},
+						{
+							"key": "values",
+							"value": "10",
+							"disabled": true
+						},
+						{
+							"key": "values",
+							"value": "20",
+							"disabled": true
+						},
+						{
+							"key": "values",
+							"value": "30",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Change bulb color"
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
