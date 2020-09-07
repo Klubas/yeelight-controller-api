@@ -30,7 +30,7 @@ class LightBulb(Resource):
                 response = response[0]
             else:
                 return_status = APIStatus.BULB_NOT_FOUND
-                raise Exception("Bulb {} was not found in the network.".format(args.ip))
+                raise Exception("Bulb {} not found in the network.".format(args.ip))
 
             if args.property:
                 if args.property in response.keys():
@@ -40,7 +40,9 @@ class LightBulb(Resource):
                 else:
                     return_status = APIStatus.VALUE_ERROR
                     raise Exception(APIMessage.VALUE_ERROR_ARG.value.get('message').format(args.property, 'property'))
+
             return Handler.success(response={args.property: response})
+
         except Exception as e:
             logging.exception(return_status.value.get('message'))
             return Handler.exception(
