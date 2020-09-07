@@ -9,7 +9,7 @@ auth = HTTPTokenAuth(scheme='Bearer')
 def verify_token(token):
 
     tokens = {
-        os.getenv('YEELIGHT_TOKEN'): os.getenv('YEELIGHT_USERNAME'),
+        os.getenv('YC_TOKEN'): os.getenv('YC_USERNAME'),
     }
 
     if token in tokens:

@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-import sys
+import os
 import argparse
+from dotenv import load_dotenv
 
 from api.run import app
+
+load_dotenv()
 
 if __name__ == "__main__":
 
@@ -18,4 +21,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    app.run(debug=args.debug)
+    debug = args.debug
+
+    if os.getenv('YC_DEBUG'):
+        debug = os.getenv('YC_DEBUG')
+
+    app.run(debug=debug)

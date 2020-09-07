@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import sys
 import argparse
 from flask import Flask
@@ -66,7 +67,12 @@ if __name__ == '__main__':
         else:
             sys.exit(-1)
 
-        app.run(host=host, port=port, debug=args.debug)
+        debug = args.debug
+
+        if os.getenv('YC_DEBUG'):
+            debug = os.getenv('YC_DEBUG')
+
+        app.run(host=host, port=port, debug=debug)
 
     except (KeyboardInterrupt, SystemExit):
         print("\nExiting...")
