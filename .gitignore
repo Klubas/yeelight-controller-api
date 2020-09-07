@@ -3,6 +3,7 @@ __pycache__/
 *.mp3
 .vscode/
 env/
+.env
 /Adafruit_CharLCD.egg-info/
 /build/
 /dist/

@@ -1,10 +1,14 @@
+import os
+from dotenv import load_dotenv
 from flask_restful import Resource
 from flask_httpauth import HTTPTokenAuth
+
+load_dotenv()
 
 auth = HTTPTokenAuth(scheme='Bearer')
 
 tokens = {
-    "secret-token-1": "admin",
+    os.getenv('TOKEN'): os.getenv('USER'),
 }
 
 
