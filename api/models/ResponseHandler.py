@@ -26,6 +26,12 @@ class APIStatus(Enum):
     SUCCESS = \
         {"message": "Operation performed successfully", "code": 200}
 
+    LOGIN_SUCCESS = \
+        {"message": "Login successful", "code": 200}
+
+    LOGIN_ERROR = \
+        {"message": "Invalid credentials.", "code": 401}
+
     ERROR = \
         {"message": "Internal server error.", "code": 500}
 

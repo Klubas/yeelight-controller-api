@@ -19,7 +19,6 @@ class LightBulbs(Resource):
             response = Bulbs.get_bulbs(metadata=True)
             return Handler.success(response=response)
         except Exception as e:
-            logging.exception(APIStatus.ERROR.value.get('message'))
             return Handler.exception(
                 status=APIStatus.ERROR,
                 exception=e,

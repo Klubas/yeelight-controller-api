@@ -1,5 +1,6 @@
 import os
 import secrets
+from datetime import datetime
 from dotenv import load_dotenv
 from flask_restful import Resource
 from flask_httpauth import HTTPTokenAuth, HTTPBasicAuth
@@ -9,58 +10,23 @@ from api.models.ResponseHandler import ResponseHandler as Handler, APIStatus
 load_dotenv()
 
 auth = HTTPTokenAuth(scheme='Bearer')
+login = HTTPBasicAuth()
 
 
 tokens = {
     secrets.token_hex(16):
-        (os.getenv('YC_USERNAME'), generate_password_hash(os.getenv('YC_PWD')))
+        (os.getenv('YC_USERNAME'), generate_password_hash(os.getenv('YC_PWD')), datetime.now())
 }
 
 
 @auth.verify_token
 def verify_token(token):
     if token in tokens:
-        return tokens[token]
-
-
-class Token(Resource):
-    decorators = [auth.login_required]
-
-    @staticmethod
-    def get():
-        """
-        Return tokens
-        :return:
-        """
-        return Handler.exception(
-            status=APIStatus.METHOD_NOT_DEFINED,
-            params=None
-        )
-
-    @staticmethod
-    def post():
-        """
-        Create new token
-        :return:
-        """
-        return Handler.exception(
-            status=APIStatus.METHOD_NOT_DEFINED,
-            params=None
-        )
-
-    @staticmethod
-    def put():
-        """
-        Update current Token
-        :return:
-        """
-        return Handler.exception(
-            status=APIStatus.METHOD_NOT_DEFINED,
-            params=None
-        )
-
-
-login = HTTPBasicAuth()
+        expiration_date = None if tokens[token][2] else None #implementar logica
+        if expiration_date:
+            return tokens[token][0]
+        else:
+            return tokens[token][0]
 
 
 @login.verify_password
@@ -74,7 +40,10 @@ def verify_password(username, password):
     if token:
         new_token = secrets.token_hex(16)
         tokens[new_token] = tokens.pop(token)
+        tokens[new_token] = (username, password, datetime.now())
         return new_token
+    else:
+        return ''
 
 
 class Logon(Resource):
@@ -86,4 +55,14 @@ class Logon(Resource):
         Return token for specified user:password
         :return:
         """
-        return Handler.success(response=login.current_user())
+        print(login.current_user())
+        if login.current_user() != '':
+            return Handler.success(
+                response=login.current_user(),
+                status=APIStatus.LOGIN_SUCCESS
+            )
+        else:
+            return Handler.exception(
+                status=APIStatus.LOGIN_ERROR,
+                params=None
+            )

@@ -69,7 +69,6 @@ class LightBulb(Resource):
             status = Bulbs.rename_bulb(ip=args.ip, new_name=args.new_name)
             return Handler.success(response=status)
         except Exception as e:
-            logging.exception(APIStatus.ERROR.value.get('message'))
             return Handler.exception(
                 status=return_status,
                 exception=e,

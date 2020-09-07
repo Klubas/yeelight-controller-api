@@ -34,7 +34,6 @@ class Color(Resource):
             status = Bulbs.change_color(ip=args.ip, values=tuple(args.color_values), color_mode=args.color_mode)
             return Handler.success(response=status)
         except Exception as e:
-            logging.exception(APIStatus.ERROR.value.get('message'))
             return Handler.exception(
                 status=APIStatus.ERROR,
                 params=args,

@@ -31,9 +31,9 @@ class Power(Resource):
             status = Bulbs.power(ip=args.ip, state=args.state)
             return Handler.success(response=status)
         except Exception as e:
-            logging.exception(APIStatus.ERROR.value.get('message'))
             return Handler.exception(
                 status=APIStatus.ERROR,
                 params=args,
                 traceback=traceback.format_exc(),
-                exception=e)
+                exception=e
+            )
