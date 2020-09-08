@@ -2,8 +2,9 @@
 import os
 import sys
 import argparse
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_restful import Api
+from dotenv import load_dotenv
 
 from api.views.Index import Index
 from api.views.LightBulbs import LightBulbs
@@ -12,25 +13,27 @@ from api.views.Power import Power
 from api.views.Color import Color
 from api.views.Authentication import Logon
 
-from dotenv import load_dotenv
-load_dotenv()
-
-
-app = Flask(__name__, static_folder="static", template_folder="templates")
-
 # configs
-app.config['EXPLAIN_TEMPLATE_LOADING'] = False
-app.config['BUNDLE_ERRORS'] = True
-
-api = Api(app)
+load_dotenv()
+app = Flask(__name__)
+app.config['EXPLAIN_TEMPLATE_LOADING'] = os.getenv('YC_EXPLAIN_TEMPLATE_LOADING')
+app.config['BUNDLE_ERRORS'] = not os.getenv('YC_DISABLE_ERROR_BUNDLE')
 
 # add resources
+api = Api(app)
 api.add_resource(Index, '/api')
 api.add_resource(Logon, '/api/logon')
 api.add_resource(LightBulbs, '/api/bulbs')
 api.add_resource(LightBulb, '/api/bulb')
 api.add_resource(Power, '/api/bulb/power')
 api.add_resource(Color, '/api/bulb/color')
+
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(
+        os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
 
 host = "0.0.0.0"
 port = 5000
