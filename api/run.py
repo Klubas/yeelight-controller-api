@@ -4,6 +4,7 @@ import sys
 import argparse
 from flask import Flask, send_from_directory
 from flask_restful import Api
+from flask_cors import CORS
 from dotenv import load_dotenv
 
 from api.views.Index import Index
@@ -16,6 +17,8 @@ from api.views.Authentication import Logon
 # configs
 load_dotenv()
 app = Flask(__name__)
+
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 app.config['EXPLAIN_TEMPLATE_LOADING'] = os.getenv('YC_EXPLAIN_TEMPLATE_LOADING')
 app.config['BUNDLE_ERRORS'] = not os.getenv('YC_DISABLE_ERROR_BUNDLE')
 
@@ -35,7 +38,7 @@ def favicon():
         os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
-host = "0.0.0.0"
+host = "localhost"
 port = 5000
 
 

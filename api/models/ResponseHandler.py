@@ -1,7 +1,6 @@
 from enum import Enum
 tb = True
 
-
 class APIMessage(Enum):
     VALUE_ERROR_ARG = \
         {"message": "Value '{}' for '{}' is invalid", "code": 400}
