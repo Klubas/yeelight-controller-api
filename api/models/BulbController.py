@@ -1,4 +1,4 @@
-import ipaddress
+import ipaddress, socket
 from yeelight import discover_bulbs, Bulb, LightType
 
 
@@ -90,9 +90,10 @@ def get_bulb(ip=None) -> Bulb:
     if ip:
         try:
             bulb = Bulb(ip=ip)
+            ipaddress.ip_address(str(ip))
             return bulb
-        except Exception as e:
-            raise Exception("Bulb not found")
+        except socket.error as e:
+            raise Exception("Bulb not found for the specified IP {}".format(ip))
     else:
         raise Exception("You must specify an ip address.")
 
