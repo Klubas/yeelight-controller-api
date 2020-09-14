@@ -1,10 +1,12 @@
-import ipaddress, socket
+import ipaddress
+import socket
+
 from yeelight import discover_bulbs, Bulb, LightType
 
 
 def __sync_bulbs__() -> list:
     """
-    Discover bulbs in local network and saves in a list
+    Discover bulbs in local network and returns in a list
     """
 
     bulbs = list()
@@ -23,26 +25,27 @@ def __sync_bulbs__() -> list:
         identifier = bulb['capabilities']['id']
 
         found_bulb = Bulb(
-            ip=ip
-            , port=port
-            , model=model
+            ip=ip,
+            port=port,
+            model=model
         )
 
         found_bulb.set_name(name)
         properties = found_bulb.get_properties()
 
         bulbs.append({
-            'bulb': found_bulb
-            , 'name': name
-            , 'model': model
-            , 'ip': ip
-            , 'metadata': {
-                'id': identifier
-                , 'ip': ip
-                , 'name': name
-                , 'model': model
-                , 'properties': properties
-            }
+            'bulb': found_bulb,
+            'name': name,
+            'model': model,
+            'ip': ip,
+            'metadata':
+                {
+                    'id': identifier,
+                    'ip': ip,
+                    'name': name,
+                    'model': model,
+                    'properties': properties
+                }
         })
 
     return bulbs
@@ -84,15 +87,15 @@ def get_bulb(ip=None) -> Bulb:
     """
     Get a Bulb by name or IP address
     :param ip:
-    :param name:
     :return:
     """
     if ip:
         try:
             bulb = Bulb(ip=ip)
             ipaddress.ip_address(str(ip))
+            bulb.get_properties()
             return bulb
-        except socket.error as e:
+        except socket.error:
             raise Exception("Bulb not found for the specified IP {}".format(ip))
     else:
         raise Exception("You must specify an ip address.")
@@ -113,11 +116,11 @@ class BulbController:
         )
 
     @staticmethod
-    def power(ip, state='toggle') -> bool:
+    def power(ip, state='toggle') -> dict:
         """
         Switch bulb power state to <state>
         :param ip:
-        :param bulb_ip:
+        :param ip:
         :param state:
         :return:
         """
@@ -135,13 +138,13 @@ class BulbController:
                 bulb.turn_off()
             else:  # toggle
                 bulb.toggle()
-
+            properties = bulb.get_properties()
+            return properties
         except Exception as e:
             raise Exception(str(e))
-        return True
 
     @staticmethod
-    def change_color(ip, values, color_mode='rgb') -> bool:
+    def change_color(ip, values, color_mode='rgb') -> dict:
         """
         Change bulb color to <color>
         :param ip:
@@ -194,14 +197,15 @@ class BulbController:
                         raise Exception("TEMP mode needs exactly 1 value. [{}]".format(values))
                     temp = values[0]
                     bulb.set_color_temp(temp)
-                return True
+                properties = bulb.get_properties()
+                return properties
             else:
-                return False
+                raise Exception("Bulb not found.")
         except Exception as e:
             raise Exception(str(e))
 
     @staticmethod
-    def rename_bulb(ip, new_name) -> bool:
+    def rename_bulb(ip, new_name) -> dict:
         """
         Change bulb name to <new_name>
         :param ip:
@@ -209,15 +213,14 @@ class BulbController:
         :return:
         """
         if not ip and not new_name:
-            raise Exception("Parameters <ip> and <new_name> must be especified.")
+            raise Exception("Parameters <ip> and <new_name> must be specified.")
 
         bulb = get_bulb(ip=ip)
 
         try:
             bulb.set_name(name=new_name)
-            return True
+            properties = bulb.get_properties()
+            return properties
 
         except Exception as e:
             raise Exception(str(e))
-
-

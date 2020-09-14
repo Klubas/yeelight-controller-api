@@ -38,7 +38,7 @@ def favicon():
         os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
-host = "localhost"
+host = "0.0.0.0"
 port = 5000
 
 
