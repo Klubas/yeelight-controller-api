@@ -34,14 +34,18 @@ class LightBulb(Resource):
 
             if args.property:
                 if args.property in response.keys():
-                    response = response[args.property]
+                    response = {
+                        args.property: response[args.property]
+                    }
                 elif args.property in response['properties'].keys():
-                    response = response['properties'][args.property]
+                    response = {
+                        args.property: response['properties'][args.property]
+                    }
                 else:
                     return_status = APIStatus.VALUE_ERROR
                     raise Exception(APIMessage.VALUE_ERROR_ARG.value.get('message').format(args.property, 'property'))
 
-            return Handler.success(response={args.property: response})
+            return Handler.success(response=response)
 
         except Exception as e:
             logging.exception(return_status.value.get('message'))
