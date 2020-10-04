@@ -23,14 +23,15 @@ class LightBulbs(Resource):
         try:
             response = Bulbs.get_bulbs(metadata=True)
 
-            fake_response = []
-            for index in range(0, len(response)):
-                fake_response.append(response[index].copy())
-            for index in range(len(response), len(response) + args.fake_bulbs):
-                fake_response.append(response[0].copy())
-            for index in range(len(response), len(fake_response)):
-                fake_response[index]["id"] = "fake_" + str(index)
-            response = fake_response
+            if len(response) > 0:
+                fake_response = []
+                for index in range(0, len(response)):
+                    fake_response.append(response[index].copy())
+                for index in range(len(response), len(response) + args.fake_bulbs):
+                    fake_response.append(response[0].copy())
+                for index in range(len(response), len(fake_response)):
+                    fake_response[index]["id"] = "fake_" + str(index)
+                response = fake_response
 
             return Handler.success(response=response)
 

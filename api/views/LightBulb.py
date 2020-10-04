@@ -48,7 +48,6 @@ class LightBulb(Resource):
             return Handler.success(response=response)
 
         except Exception as e:
-            logging.exception(return_status.value.get('message'))
             return Handler.exception(
                 status=return_status,
                 params=args,
