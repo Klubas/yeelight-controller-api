@@ -1,4 +1,4 @@
-# yeelight-controller-api
+# YeelightHub API
 
 This repo contains the yeelight-controller-api. 
 
