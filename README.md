@@ -20,23 +20,32 @@ This repo contains the yeelight-controller-api. With this you can get and contro
     YC_DEBUG=True
 
 #### Endpoints
-There's a postman collection in the repo with usage examples os all endpoints.
 
-    [POST] /api/logon
 Returns the authentication token
     
-    [GET] /api/bulbs
+    [POST] /api/logon
+    
 Returns all properties of all the bulbs in the network
     
-    [GET] /api/bulb
-Return on or all properties of the specified bulb
+    [GET] /api/bulbs
     
-    [PUT] /api/bulb
+Return one or all properties of the specified bulb
+
+    [GET] /api/bulb?ip=<bulb_ip>[&property=<property_name>]
+    
 Update bulb name
+
+    [PUT] /api/bulb?ip=<bulb_ip>
     
-    [POST] /api/bulb/power
 Change bulb power state (on/off). Default is to toggle.
-    
-    [POST] /api/bulb/color
+
+    [POST] /api/bulb/power?ip=<bulb_ip>[&state=<on/off/toggle>]
+
 Change bulb color. Color modes may be RGB, HSV, Brightness, or Color temperature
+
+    [POST] /api/bulb/color?ip=<bulb_ip>&color=<red>&color=<green>&color=<blue>
+
+
+There's a postman collection in the repo with usage examples os all endpoints.
+
 
