@@ -1,10 +1,8 @@
 # YeelightHub API
 
-This repo contains the yeelight-controller-api. 
+This repo contains the yeelight-controller-api. With this you can get and control all yeelight bulbs in your network. 
 
-With it you can (theoretically, I just have one) view and control all yeelight bulbs in your network. 
-
-#### Start server locally:
+### Start server locally:
     
     gunicorn --bind <hostname>:<port> wsgi:app
     
