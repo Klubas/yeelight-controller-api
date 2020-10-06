@@ -33,9 +33,9 @@ Return one or all properties of the specified bulb
 
     [GET] /api/bulb?ip=<bulb_ip>[&property=<property_name>]
     
-Update bulb name
+Rename bulb
 
-    [PUT] /api/bulb?ip=<bulb_ip>
+    [PUT] /api/bulb?ip=<bulb_ip>[&new_name=<new_name>]
     
 Change bulb power state (on/off). Default is to toggle.
 
