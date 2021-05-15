@@ -24,6 +24,6 @@ if __name__ == "__main__":
     debug = args.debug
 
     if os.getenv('YC_DEBUG'):
-        debug = os.getenv('YC_DEBUG')
+        debug = True if os.getenv('YC_DEBUG') == 'True' else False
 
     app.run(debug=debug)

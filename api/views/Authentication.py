@@ -14,6 +14,7 @@ login = HTTPBasicAuth()
 
 env_username = os.getenv('YC_USERNAME')
 env_password = os.getenv('YC_PWD')
+env_local_token = os.getenv('YC_LOCAL_TOKEN')
 
 if not env_username or not env_password:
     raise Exception("Environment variables not set in .env\n{}".format('YC_USERNAME, YC_PWD'))
@@ -22,17 +23,39 @@ else:
     tokens = {
         secrets.token_hex(16):
             (env_username, env_password, datetime.now())
-}
+    }
+
+    if env_local_token:
+        tokens[env_local_token] = (
+            secrets.token_hex(16)
+            , secrets.token_hex(16)
+            , datetime.now()
+        )
+
+
+def allow_local_access(token):
+    from flask import request
+    req_ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+    req_ip.replace('localhost', '127.0.0.1')
+
+    ip_range = req_ip.split('.')
+    ip_range = ip_range[0] + '.' + ip_range[1]
+
+    if ip_range in ('127.0', '0.0', '192.168'):
+        return True
 
 
 @auth.verify_token
 def verify_token(token):
     if token in tokens:
 
-        expiration_date = \
-            tokens[token][2] + timedelta(days=3) if tokens[token][2] \
-            else None
+        if env_local_token:
+            if allow_local_access(token):
+                return tokens[token][0]
 
+        expiration_date = tokens[token][2] + timedelta(days=3) if tokens[token][2] else None
+
+        # Esqueci de terminar isso, não lembro qual era o plano
         if expiration_date:
             return tokens[token][0]
         else:
