@@ -2,6 +2,10 @@
 
 This repo contains the yeelight-controller-api. With this you can get and control all yeelight bulbs in your network. 
 
+## Todo
+
+* Create endpoint to change/create scenes
+
 ### Start server locally:
     
     gunicorn --bind <hostname>:<port> wsgi:app
