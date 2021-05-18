@@ -12,12 +12,13 @@ This repo contains the yeelight-controller-api. With this you can get and contro
 
 > make sure you are using the correct Dockerfiles    
 
-#### User credentials:
+### Environment variables (.env)
 
     #.env 
-    YC_USERNAME='admin'
-    YC_PWD='secret'
-    YC_DEBUG=True
+    YC_DEBUG=True                   # Debug mode, if true will add stacktrace field in json response
+    YC_USERNAME=admin               # Username
+    YC_PWD=secret                   # Password
+    YC_LOCAL_TOKEN=local_network    # Defined if you want to accepet requests from local network without authentication
 
 #### Endpoints
 
