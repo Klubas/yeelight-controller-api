@@ -1,5 +1,11 @@
+import os
+from dotenv import load_dotenv
 from enum import Enum
-tb = True
+
+load_dotenv()
+
+tb = True if os.getenv('YC_DEBUG') == 'True' else False
+
 
 class APIMessage(Enum):
     VALUE_ERROR_ARG = \

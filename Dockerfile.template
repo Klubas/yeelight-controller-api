@@ -1,4 +1,4 @@
-FROM balenalib/raspberry-pi-alpine-python:3-latest-run
+FROM balenalib/%%BALENA_ARCH%%-alpine-python:3-latest-run
 WORKDIR /usr/src/app
 COPY . .
 RUN pip3 install wheel
