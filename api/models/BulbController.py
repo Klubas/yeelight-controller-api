@@ -12,7 +12,7 @@ def __sync_bulbs__() -> list:
     bulbs = list()
 
     try:
-        discovered_bulbs = discover_bulbs()
+        discovered_bulbs = discover_bulbs(timeout=2)
     except Exception as e:
         raise Exception(str(e))
 
@@ -49,6 +49,13 @@ def __sync_bulbs__() -> list:
         })
 
     return bulbs
+
+
+def hex_to_rgb(hex_value):
+    try:
+        return tuple(int(hex_value[i:i + 2], 16) for i in (0, 2, 4))
+    except Exception as e:
+        raise Exception('Invalid hex value {} - {}'.format(hex_value, str(e)))
 
 
 def get_bulbs(ip=None, name=None, model=None, metadata=False) -> list:
@@ -149,7 +156,7 @@ class BulbController:
         Change bulb color to <color>
         :param ip:
         :param values:
-            RGB:    (<int>, <int>, <int>)   red, green, blue
+            RGB:    (<int>, <int>, <int>)   red, green, blue or hex value
             HSV:    (<int>, <int>, [int])   hue, saturation, value
             BRIGHT: (<int>, [int])          brightness, ambient_light [0,1]
             TEMP:   (<int>, )               temperature
@@ -167,40 +174,55 @@ class BulbController:
         bulb = get_bulb(ip=ip)
 
         try:
-            if bulb:
-                if color_mode == modes[0]:
-                    if len(values) != 3:
-                        raise Exception("RGB mode needs exactly 3 values. [{}]".format(values))
-                    red = values[0]
-                    green = values[1]
-                    blue = values[2]
-                    try:
-                        bulb.set_rgb(red, green, blue)
-                    except Exception as e:
-                        raise e
-                elif color_mode == modes[1]:
-                    if len(values) > 3 or len(values) < 2:
-                        raise Exception("HSV mode needs 2 or 3 values. [{}]".format(values))
-                    hue = values[0]
-                    sat = values[1]
-                    val = values[2]
-                    bulb.set_hsv(hue, sat, val)
-                elif color_mode == modes[2]:
-                    if len(values) > 2 or len(values) < 1:
-                        raise Exception("BRIGHT mode needs 1 or 2 values. [{}]".format(values))
-                    bright = values[0]
-                    ambient = values[1] if values[1] else False
-                    light_type = LightType.Ambient if ambient > 0 else LightType.Main
-                    bulb.set_brightness(bright, light_type=light_type)
-                elif color_mode == modes[3]:
-                    if len(values) != 1:
-                        raise Exception("TEMP mode needs exactly 1 value. [{}]".format(values))
-                    temp = values[0]
-                    bulb.set_color_temp(temp)
+            if not bulb:
+                raise Exception("Bulb not found.")
+
+            if color_mode == 'rgb':
+                if len(values) == 1:
+                    rgb_values = hex_to_rgb(values[0])
+                elif len(values) == 3:
+                    rgb_values = values
+                else:
+                    raise Exception(
+                        "RGB mode needs exactly 1 (hexadecimal) or 3 values (decimal). [{}]".format(values))
+
+                red = int(rgb_values[0])
+                green = int(rgb_values[1])
+                blue = int(rgb_values[2])
+                bulb.set_rgb(red, green, blue)
                 properties = bulb.get_properties()
                 return properties
-            else:
-                raise Exception("Bulb not found.")
+
+            if color_mode == 'hsv':
+                if len(values) > 3 or len(values) < 2:
+                    raise Exception("HSV mode needs 2 or 3 values. [{}]".format(values))
+                hue = values[0]
+                sat = values[1]
+                val = values[2]
+                bulb.set_hsv(hue, sat, val)
+                properties = bulb.get_properties()
+                return properties
+
+            if color_mode == 'bright':
+                if len(values) > 2 or len(values) < 1:
+                    raise Exception("BRIGHT mode needs 1 or 2 values. [{}]".format(values))
+                bright = values[0]
+                ambient = values[1] if values[1] else False
+                light_type = LightType.Ambient if ambient > 0 else LightType.Main
+                bulb.set_brightness(bright, light_type=light_type)
+                properties = bulb.get_properties()
+                return properties
+
+            if color_mode == 'temp':
+                if len(values) != 1:
+                    raise Exception("TEMP mode needs exactly 1 value. [{}]".format(values))
+                temp = values[0]
+                bulb.set_color_temp(temp)
+                properties = bulb.get_properties()
+                return properties
+
+            raise Exception("Unexpected color mode {}".format(color_mode))
+
         except Exception as e:
             raise Exception(str(e))
 

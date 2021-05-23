@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import os
-import argparse
 from dotenv import load_dotenv
 
 from api.run import app
@@ -8,22 +7,7 @@ from api.run import app
 load_dotenv()
 
 if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(
-            description="WSGI"
-    )
-
-    parser.add_argument(
-            '--debug'
-            , help="Run in debug mode"
-            , action='store_true'
-    )
-
-    args = parser.parse_args()
-
-    debug = args.debug
-
-    if os.getenv('YC_DEBUG'):
-        debug = True if os.getenv('YC_DEBUG') == 'True' else False
-
-    app.run(debug=debug)
+    host = os.getenv('YC_HOSTNAME') if os.getenv('YC_HOSTNAME') else '0.0.0.0'
+    port = os.getenv('YC_PORT') if os.getenv('YC_PORT') else '5000'
+    debug = True if os.getenv('YC_DEBUG') == 'True' else False
+    app.run(host=host, port=port, debug=debug)

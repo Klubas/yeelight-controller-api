@@ -24,14 +24,16 @@ class Color(Resource):
                             help=APIMessage.REQUIRED_ARG.value.get('message')
                             .format('mode', 'rgb, hsv, bright, temp'))
 
-        parser.add_argument('values', dest='color_values', action='append', type=int, required=True, location=['json', 'values'],
+        parser.add_argument('values', dest='color_values', type=str, required=True, location=['json', 'values'],
                             help=APIMessage.REQUIRED_ARG.value.get('message')
                             .format('values', '[<int>, [int], [int]]'))
 
         args = parser.parse_args()
 
+        color_values = args.color_values.split(',')
+
         try:
-            status = Bulbs.change_color(ip=args.ip, values=tuple(args.color_values), color_mode=args.color_mode)
+            status = Bulbs.change_color(ip=args.ip, values=tuple(color_values), color_mode=args.color_mode)
             return Handler.success(response=status)
         except Exception as e:
             return Handler.exception(

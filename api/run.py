@@ -38,10 +38,6 @@ def favicon():
         os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
-host = "0.0.0.0"
-port = 5000
-
-
 if __name__ == '__main__':
 
     try:
@@ -56,6 +52,7 @@ if __name__ == '__main__':
             , type=str
             , help="hostname and port number for the server in the format: <hostname>:<port>"
             , nargs="?"
+            , required=True
         )
 
         parser.add_argument(
@@ -74,9 +71,6 @@ if __name__ == '__main__':
             sys.exit(-1)
 
         debug = args.debug
-
-        if os.getenv('YC_DEBUG'):
-            debug = os.getenv('YC_DEBUG')
 
         app.run(host=host, port=port, debug=debug)
 
