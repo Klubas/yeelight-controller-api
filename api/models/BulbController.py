@@ -179,16 +179,16 @@ class BulbController:
 
             if color_mode == 'rgb':
                 if len(values) == 1:
-                    rgb_values = hex_to_rgb(values[0])
+                    rgb_values = hex_to_rgb(str(values[0]))
                 elif len(values) == 3:
                     rgb_values = values
                 else:
                     raise Exception(
                         "RGB mode needs exactly 1 (hexadecimal) or 3 values (decimal). [{}]".format(values))
 
-                red = int(rgb_values[0])
-                green = int(rgb_values[1])
-                blue = int(rgb_values[2])
+                red = rgb_values[0]
+                green = rgb_values[1]
+                blue = rgb_values[2]
                 bulb.set_rgb(red, green, blue)
                 properties = bulb.get_properties()
                 return properties

@@ -31,6 +31,7 @@ class Color(Resource):
         args = parser.parse_args()
 
         color_values = args.color_values.split(',')
+        color_values = list(map(int, color_values))
 
         try:
             status = Bulbs.change_color(ip=args.ip, values=tuple(color_values), color_mode=args.color_mode)
