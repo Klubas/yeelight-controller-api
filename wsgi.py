@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import os
 from dotenv import load_dotenv
-
 from api.run import app
 
 load_dotenv()

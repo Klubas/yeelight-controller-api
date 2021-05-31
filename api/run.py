@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 import os
-import sys
 import argparse
 from flask import Flask, send_from_directory
-from flask_restful import Api
+from flask_restful import Api, Resource
 from flask_cors import CORS
 from dotenv import load_dotenv
 
-from api.views.Index import Index
+from api.views.Index import Index, Favicon
 from api.views.LightBulbs import LightBulbs
 from api.views.LightBulb import LightBulb
 from api.views.Power import Power
@@ -24,19 +23,13 @@ app.config['BUNDLE_ERRORS'] = not os.getenv('YC_DISABLE_ERROR_BUNDLE')
 
 # add resources
 api = Api(app)
+api.add_resource(Favicon, '/favicon.ico')
 api.add_resource(Index, '/api')
 api.add_resource(Logon, '/api/logon')
 api.add_resource(LightBulbs, '/api/bulbs')
 api.add_resource(LightBulb, '/api/bulb')
 api.add_resource(Power, '/api/bulb/power')
 api.add_resource(Color, '/api/bulb/color')
-
-
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory(
-        os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
-
 
 if __name__ == '__main__':
 
@@ -52,7 +45,7 @@ if __name__ == '__main__':
             , type=str
             , help="hostname and port number for the server in the format: <hostname>:<port>"
             , nargs="?"
-            , required=True
+            , required=False
         )
 
         parser.add_argument(
@@ -68,9 +61,10 @@ if __name__ == '__main__':
             host = hostname[0]
             port = int(hostname[1])
         else:
-            sys.exit(-1)
+            host = os.getenv('YC_HOSTNAME') if os.getenv('YC_HOSTNAME') else '0.0.0.0'
+            port = os.getenv('YC_PORT') if os.getenv('YC_PORT') else '5000'
 
-        debug = args.debug
+        debug = True if os.getenv('YC_DEBUG') == 'True' else args.debug
 
         app.run(host=host, port=port, debug=debug)
 
