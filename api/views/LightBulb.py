@@ -10,7 +10,7 @@ class LightBulb(Resource):
     decorators = [auth.login_required]
 
     @staticmethod
-    def get():
+    def get(self, bulb_id):
         """
         Get bulb metadata by ip
         :return:
