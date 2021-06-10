@@ -22,7 +22,7 @@ This repo contains the yeelight-controller-api. With this you can get and contro
     YC_DEBUG=True                   # Debug mode, if true will add stacktrace field in json response
     YC_USERNAME=admin               # Username
     YC_PWD=secret                   # Password
-    YC_LOCAL_TOKEN=local_network    # Defined if you want to accepet requests from local network without authentication
+    YC_LOCAL_TOKEN=local_network    # Define if you want to accepet requests from local network without authentication
 
 #### Endpoints
 
