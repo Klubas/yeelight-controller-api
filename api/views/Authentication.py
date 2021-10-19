@@ -33,7 +33,7 @@ else:
         )
 
 
-def allow_local_access(token):
+def allow_local_access():
     from flask import request
     req_ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
     req_ip.replace('localhost', '127.0.0.1')
@@ -43,23 +43,23 @@ def allow_local_access(token):
 
     if ip_range in ('127.0', '0.0', '192.168'):
         return True
+    return False
 
 
 @auth.verify_token
 def verify_token(token):
     if token in tokens:
 
+        username = tokens[token][0]
         if env_local_token:
-            if allow_local_access(token):
-                return tokens[token][0]
+            if allow_local_access():
+                return username
 
-        expiration_date = tokens[token][2] + timedelta(days=3) if tokens[token][2] else None
+        expiration_date = tokens[token][2] + timedelta(days=3)
+        expired = True if expiration_date > datetime.now() else False
 
-        # Esqueci de terminar isso, não lembro qual era o plano
-        if expiration_date:
-            return tokens[token][0]
-        else:
-            return tokens[token][0]
+        if not expired:
+            return username
 
 
 @login.verify_password
