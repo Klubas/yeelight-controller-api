@@ -212,11 +212,11 @@ class BulbController:
         )
 
     @staticmethod
-    def power(ip, state='toggle') -> dict:
+    def power(ip=None, state='toggle', identifier=None) -> dict:
         """
         Switch bulb power state to <state>
         :param ip:
-        :param ip:
+        :param identifier:
         :param state:
         :return:
         """
@@ -225,7 +225,7 @@ class BulbController:
         if state.lower() not in states:
             raise Exception("Invalid power state [{}]. Must be in {}.".format(state, str(states)))
 
-        bulb = get_bulb(ip=ip)
+        bulb = get_bulb(ip=ip, identifier=identifier)
 
         try:
             if state == states[0]:  # on
@@ -240,10 +240,11 @@ class BulbController:
             raise Exception(str(e))
 
     @staticmethod
-    def change_color(ip, values, color_mode='rgb') -> dict:
+    def change_color(ip, values, color_mode='rgb', identifier=None) -> dict:
         """
         Change bulb color to <color>
         :param ip:
+        :param identifier:
         :param values:
             RGB:    (<int>, <int>, <int>)   red, green, blue or hex value
             HSV:    (<int>, <int>, [int])   hue, saturation, value
@@ -260,7 +261,7 @@ class BulbController:
         if not values:
             raise Exception("Parameter <values> must be specified.")
 
-        bulb = get_bulb(ip=ip)
+        bulb = get_bulb(ip=ip, identifier=identifier)
 
         try:
             if not bulb:

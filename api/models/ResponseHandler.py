@@ -16,6 +16,9 @@ class APIMessage(Enum):
 
 
 class APIStatus(Enum):
+    ID_REQUIRED = \
+        {"message": "Param ID is required for this action.", "code": 400}
+
     IP_REQUIRED = \
         {"message": "Param IP is required for this action.", "code": 400}
 

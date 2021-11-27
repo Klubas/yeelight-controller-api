@@ -18,7 +18,9 @@ class Power(Resource):
         :return:
         """
         parser = reqparse.RequestParser()
-        parser.add_argument('ip', type=str, required=True,
+        parser.add_argument('id', type=str, required=False,
+                            help=APIStatus.ID_REQUIRED.value.get('message'))
+        parser.add_argument('ip', type=str, required=False,
                             help=APIStatus.IP_REQUIRED.value.get('message'))
         parser.add_argument('state', type=str, required=False,
                             help=APIMessage.REQUIRED_ARG.value.get('message')
@@ -26,10 +28,13 @@ class Power(Resource):
 
         args = parser.parse_args()
 
+        if not args.id and not args.ip:
+            raise Exception("Bulb ID is required.")
+
         args.state = args.state if args.state else 'toggle'
 
         try:
-            status = Bulbs.power(ip=args.ip, state=args.state)
+            status = Bulbs.power(ip=args.ip, state=args.state, identifier=args.id)
             return Handler.success(response=status)
         except Exception as e:
             return Handler.exception(

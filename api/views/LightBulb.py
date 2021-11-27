@@ -20,7 +20,7 @@ class LightBulb(Resource):
         parser.add_argument('ip', type=str, required=False,
                             help=APIStatus.IP_REQUIRED.value.get('message'))
         parser.add_argument('id', type=str, required=False,
-                            help=APIStatus.IP_REQUIRED.value.get('message'))
+                            help=APIStatusD_REQUIRED.value.get('message'))
         parser.add_argument('property', type=str, required=False,
                             help='Returns a bulb property')
         args = parser.parse_args()
@@ -71,7 +71,7 @@ class LightBulb(Resource):
         parser.add_argument('ip', type=str, required=False,
                             help=APIStatus.IP_REQUIRED.value.get('message'))
         parser.add_argument('id', type=str, required=False,
-                            help=APIStatus.IP_REQUIRED.value.get('message'))
+                            help=APIStatus.ID_REQUIRED.value.get('message'))
         parser.add_argument('new_name', type=str, required=True,
                             help=APIMessage.REQUIRED_ARG.value.get('message')
                             .format('new_name', None))

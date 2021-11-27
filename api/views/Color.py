@@ -17,8 +17,11 @@ class Color(Resource):
         """
         parser = reqparse.RequestParser()
 
-        parser.add_argument('ip', type=str, required=True,
+        parser.add_argument('ip', type=str, required=False,
                             help=APIStatus.IP_REQUIRED.value.get('message'))
+
+        parser.add_argument('id', type=str, required=False,
+                            help=APIStatus.ID_REQUIRED.value.get('message'))
 
         parser.add_argument('mode', dest='color_mode', type=str, required=True, location=['json', 'values'],
                             help=APIMessage.REQUIRED_ARG.value.get('message')
@@ -30,11 +33,19 @@ class Color(Resource):
 
         args = parser.parse_args()
 
+        if not args.id and not args.ip:
+            raise Exception("Bulb ID is required.")
+
         color_values = args.color_values.split(',')
         color_values = list(map(int, color_values))
 
         try:
-            status = Bulbs.change_color(ip=args.ip, values=tuple(color_values), color_mode=args.color_mode)
+            status = Bulbs.change_color(
+                ip=args.ip
+                , values=tuple(color_values)
+                , color_mode=args.color_mode
+                , identifier=args.id
+            )
             return Handler.success(response=status)
         except Exception as e:
             return Handler.exception(
