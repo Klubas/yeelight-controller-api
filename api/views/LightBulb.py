@@ -10,21 +10,26 @@ class LightBulb(Resource):
     decorators = [auth.login_required]
 
     @staticmethod
-    def get(self, bulb_id):
+    def get():
         """
         Get bulb metadata by ip
         :return:
         """
         return_status = APIStatus.ERROR
         parser = reqparse.RequestParser()
-        parser.add_argument('ip', type=str, required=True,
+        parser.add_argument('ip', type=str, required=False,
+                            help=APIStatus.IP_REQUIRED.value.get('message'))
+        parser.add_argument('id', type=str, required=False,
                             help=APIStatus.IP_REQUIRED.value.get('message'))
         parser.add_argument('property', type=str, required=False,
                             help='Returns a bulb property')
         args = parser.parse_args()
 
+        if not args.id and not args.ip:
+            raise Exception("Bulb ID is required.")
+
         try:
-            response = Bulbs.get_bulbs(ip=args.ip, metadata=True)
+            response = Bulbs.get_bulbs(ip=args.ip, metadata=True, identifier=args.id)
 
             if len(response) > 0:
                 response = response[0]
@@ -63,15 +68,20 @@ class LightBulb(Resource):
         """
         return_status = APIStatus.ERROR
         parser = reqparse.RequestParser()
-        parser.add_argument('ip', type=str, required=True,
+        parser.add_argument('ip', type=str, required=False,
+                            help=APIStatus.IP_REQUIRED.value.get('message'))
+        parser.add_argument('id', type=str, required=False,
                             help=APIStatus.IP_REQUIRED.value.get('message'))
         parser.add_argument('new_name', type=str, required=True,
                             help=APIMessage.REQUIRED_ARG.value.get('message')
                             .format('new_name', None))
         args = parser.parse_args()
 
+        if not args.id and not args.ip:
+            raise Exception("Bulb ID is required.")
+
         try:
-            status = Bulbs.rename_bulb(ip=args.ip, new_name=args.new_name)
+            status = Bulbs.rename_bulb(ip=args.ip, new_name=args.new_name, identifier=args.id)
             return Handler.success(response=status)
         except Exception as e:
             return Handler.exception(

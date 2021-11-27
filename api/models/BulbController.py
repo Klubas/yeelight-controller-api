@@ -1,7 +1,11 @@
 import ipaddress
+import os
 import socket
+from dotenv import load_dotenv
 
 from yeelight import discover_bulbs, Bulb, LightType
+
+load_dotenv()
 
 
 def __sync_bulbs__() -> list:
@@ -12,7 +16,7 @@ def __sync_bulbs__() -> list:
     bulbs = list()
 
     try:
-        discovered_bulbs = discover_bulbs(timeout=2)
+        discovered_bulbs = discover_bulbs(timeout=int(os.getenv('YC_SYNC_TIMEOUT')))
     except Exception as e:
         raise Exception(str(e))
 
@@ -23,7 +27,6 @@ def __sync_bulbs__() -> list:
         name = bulb['capabilities']['name']
         name = name if name != '' else ip
         identifier = bulb['capabilities']['id']
-
         found_bulb = Bulb(
             ip=ip,
             port=port,
@@ -34,6 +37,7 @@ def __sync_bulbs__() -> list:
         properties = found_bulb.get_properties()
 
         bulbs.append({
+            'id': identifier,
             'bulb': found_bulb,
             'name': name,
             'model': model,
@@ -131,9 +135,10 @@ class BulbColorController:
         bulb.set_rgb(red, green, blue)
 
 
-def get_bulbs(ip=None, name=None, model=None, metadata=False) -> list:
+def get_bulbs(ip=None, name=None, model=None, metadata=False, identifier=None) -> list:
     """
     Get a list of bulbs by ip, name or model
+    :param identifier:
     :param ip:
     :param name:
     :param model:
@@ -152,8 +157,11 @@ def get_bulbs(ip=None, name=None, model=None, metadata=False) -> list:
     elif model:
         param = 'model'
         value = model
-    elif not ip:
+    elif not ip and not identifier:
         return_all = True
+    elif identifier:
+        param = 'id'
+        value = identifier
     elif ip:
         ipaddress.ip_address(str(ip))
 
@@ -163,12 +171,19 @@ def get_bulbs(ip=None, name=None, model=None, metadata=False) -> list:
     return bulbs
 
 
-def get_bulb(ip=None) -> Bulb:
+def get_bulb(ip=None, identifier=None) -> Bulb:
     """
     Get a Bulb by IP address
     :param ip:
+    :param identifier:
     :return:
     """
+
+    if identifier:
+        for bulb in __sync_bulbs__():
+            if bulb['id'] == identifier:
+                ip = bulb['ip']
+
     if ip:
         try:
             bulb = Bulb(ip=ip)
@@ -178,21 +193,22 @@ def get_bulb(ip=None) -> Bulb:
         except socket.error:
             raise Exception("Bulb not found for the specified IP {}".format(ip))
     else:
-        raise Exception("You must specify an ip address.")
+        raise Exception("You must specify an ip address or bulb identifier.")
 
 
 class BulbController:
     @staticmethod
-    def get_bulb(ip=None):
-        return get_bulb(ip=ip)
+    def get_bulb(ip=None, identifier=None):
+        return get_bulb(ip=ip, identifier=identifier)
 
     @staticmethod
-    def get_bulbs(ip=None, name=None, model=None, metadata=False):
+    def get_bulbs(ip=None, name=None, model=None, metadata=False, identifier=None):
         return get_bulbs(
             ip=ip,
             name=name,
             model=model,
-            metadata=metadata
+            metadata=metadata,
+            identifier=identifier
         )
 
     @staticmethod
@@ -269,50 +285,18 @@ class BulbController:
             raise Exception(str(e))
 
     @staticmethod
-    def music(ip, action) -> dict:
-        """
-        Start or stop music mode
-        :param ip:
-        :param action:
-        :return:
-        """
-        actions = ['start', 'stop', 'toggle']
-
-        if action.lower() not in actions:
-            raise Exception("Invalid action [{}]. Must be in {}.".format(action, str(actions)))
-
-        bulb = get_bulb(ip=ip)
-
-        try:
-            if action == actions[0]:  # on
-                bulb.start_music()
-            elif action == actions[1]:  # off
-                bulb.stop_music()
-            else:  # toggle
-                print('Music mode: ' + ('on' if bulb.music_mode else 'off'))
-                if bulb.music_mode:
-                    bulb.stop_music()
-                else:
-                    bulb.start_music()
-
-            print('Music mode: ' + ('on' if bulb.music_mode else 'off'))
-            properties = bulb.get_properties()
-            return properties
-        except Exception as e:
-            raise Exception(str(e))
-
-    @staticmethod
-    def rename_bulb(ip, new_name) -> dict:
+    def rename_bulb(ip, new_name, identifier) -> dict:
         """
         Change bulb name to <new_name>
         :param ip:
+        :param identifier:
         :param new_name:
         :return:
         """
-        if not ip and not new_name:
-            raise Exception("Parameters <ip> and <new_name> must be specified.")
+        if not identifier and not ip and not new_name:
+            raise Exception("Parameters <identifier> and <new_name> must be specified.")
 
-        bulb = get_bulb(ip=ip)
+        bulb = get_bulb(ip=ip, identifier=identifier)
 
         try:
             bulb.set_name(name=new_name)

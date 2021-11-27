@@ -24,10 +24,6 @@ class LightBulbs(Resource):
             response = Bulbs.get_bulbs(metadata=True)
 
             if len(response) > 0:
-                for bulb in response:
-                    bulb['url'] = '/api/bulb/' + bulb['id']
-
-            if len(response) > 0:
                 fake_response = []
                 for index in range(0, len(response)):
                     fake_response.append(response[index].copy())
