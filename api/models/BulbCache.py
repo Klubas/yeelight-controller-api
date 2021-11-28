@@ -25,6 +25,20 @@ class BulbCache:
 
         return bulbs
 
+    def sync_bulb_properties(self, identifier):
+        ip = self.cached_bulbs[identifier]['ip']
+        bulb = Bulb(ip=ip)
+        properties = bulb.get_properties()
+
+        self.cached_bulbs[identifier]['power'] = properties['power']
+        self.cached_bulbs[identifier]['bright'] = properties['bright']
+        self.cached_bulbs[identifier]['ct'] = properties['ct']
+        self.cached_bulbs[identifier]['rgb'] = properties['rgb']
+        self.cached_bulbs[identifier]['hue'] = properties['hue']
+        self.cached_bulbs[identifier]['sat'] = properties['sat']
+        self.cached_bulbs[identifier]['current_brightness'] = properties['current_brightness']
+        self.cached_bulbs[identifier]['timestamp'] = str(datetime.now())
+
     def get_bulbs(self, ip=None, name=None, model=None, identifier=None, cache_only=False) -> list:
         """
         Get a list of bulbs by ip, name or model
@@ -96,6 +110,9 @@ class BulbCache:
         else:
             raise Exception("You must specify an ip address or bulb identifier.")
 
+    def get_bulb_properties(self, identifier=None) -> dict:
+        return self.cached_bulbs[identifier]
+
     def insert_bulb(self, bulb):
 
         ip = bulb['ip']
@@ -131,7 +148,6 @@ class BulbCache:
             'hue': properties['hue'],
             'sat': properties['sat'],
             'current_brightness': properties['current_brightness'],
-            'properties': properties,
             'cached_properties': cached_properties,
             'timestamp': str(datetime.now())
         }
@@ -139,8 +155,11 @@ class BulbCache:
         if len(cached_properties.items()) == 0:
             self.update_cached_property(identifier, 'color_mode', 'temp')
 
-    def update_cached_property(self, bulb_id, property_name, property_value):
-        self.cached_bulbs[bulb_id]['cached_properties'][property_name] = property_value
+    def update_property(self, identifier, property_name, property_value):
+        self.cached_bulbs[identifier][property_name] = property_value
+
+    def update_cached_property(self, identifier, property_name, property_value):
+        self.cached_bulbs[identifier]['cached_properties'][property_name] = property_value
 
     def clear(self):
         self.cached_bulbs.clear()

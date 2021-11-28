@@ -4,7 +4,7 @@ from yeelight import LightType
 from api.models.BulbCache import BulbCache
 
 load_dotenv()
-cached_bulbs = BulbCache()
+found_bulbs = BulbCache()
 
 
 class BulbColorController:
@@ -90,11 +90,11 @@ class BulbColorController:
 class BulbController:
     @staticmethod
     def get_bulb(ip=None, identifier=None):
-        return cached_bulbs.get_bulb(ip=ip, identifier=identifier)
+        return found_bulbs.get_bulb(ip=ip, identifier=identifier)
 
     @staticmethod
     def get_bulbs(ip=None, name=None, model=None, metadata=False, identifier=None):
-        return cached_bulbs.get_bulbs(
+        return found_bulbs.get_bulbs(
             ip=ip,
             name=name,
             model=model,
@@ -115,7 +115,7 @@ class BulbController:
         if state.lower() not in states:
             raise Exception("Invalid power state [{}]. Must be in {}.".format(state, str(states)))
 
-        bulb = cached_bulbs.get_bulb(ip=ip, identifier=identifier)
+        bulb = found_bulbs.get_bulb(ip=ip, identifier=identifier)
 
         try:
             if state == states[0]:  # on
@@ -124,8 +124,9 @@ class BulbController:
                 bulb.turn_off()
             else:  # toggle
                 bulb.toggle()
-            properties = bulb.get_properties()
-            return properties
+            found_bulbs.update_property(identifier, 'power', state)
+            return found_bulbs.get_bulb_properties(identifier)
+
         except Exception as e:
             raise Exception(str(e))
 
@@ -151,7 +152,7 @@ class BulbController:
         if not values:
             raise Exception("Parameter <values> must be specified.")
 
-        bulb = cached_bulbs.get_bulb(ip=ip, identifier=identifier)
+        bulb = found_bulbs.get_bulb(ip=ip, identifier=identifier)
 
         try:
             if not bulb:
@@ -169,13 +170,15 @@ class BulbController:
             if color_mode == 'temp':
                 BulbColorController.change_temp(bulb, values)
 
-            cached_bulbs.update_cached_property(
-                bulb_id=identifier
+            found_bulbs.update_cached_property(
+                identifier=identifier
                 , property_name='color_mode'
                 , property_value=color_mode
             )
-            properties = bulb.get_properties()
-            return properties
+
+            found_bulbs.sync_bulb_properties(identifier)
+
+            return found_bulbs.get_bulb_properties(identifier)
 
         except Exception as e:
             raise Exception(str(e))
@@ -192,12 +195,12 @@ class BulbController:
         if not identifier and not ip and not new_name:
             raise Exception("Parameters <identifier> and <new_name> must be specified.")
 
-        bulb = cached_bulbs.get_bulb(ip=ip, identifier=identifier)
+        bulb = found_bulbs.get_bulb(ip=ip, identifier=identifier)
 
         try:
             bulb.set_name(name=new_name)
-            properties = bulb.get_properties()
-            return properties
+            found_bulbs.update_property(identifier, 'name', new_name)
+            return found_bulbs.get_bulb_properties(identifier)
 
         except Exception as e:
             raise Exception(str(e))
