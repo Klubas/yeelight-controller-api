@@ -35,7 +35,7 @@ class LightBulb(Resource):
                 response = response[0]
             else:
                 return_status = APIStatus.BULB_NOT_FOUND
-                raise Exception("Bulb {} not found in the network.".format(args.ip))
+                raise Exception("Bulb {} not found in the network.".format(args.id if args.id else args.ip))
 
             if args.property:
                 if args.property in response.keys():

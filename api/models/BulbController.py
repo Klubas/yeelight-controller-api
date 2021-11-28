@@ -2,55 +2,27 @@ import ipaddress
 import os
 import socket
 from dotenv import load_dotenv
-
 from yeelight import discover_bulbs, Bulb, LightType
 
+from api.models.BulbCache import BulbCache
+
 load_dotenv()
+cached_bulbs = BulbCache()
 
 
 def __sync_bulbs__() -> list:
     """
     Discover bulbs in local network and returns in a list
     """
-
-    bulbs = list()
-
     try:
         discovered_bulbs = discover_bulbs(timeout=int(os.getenv('YC_SYNC_TIMEOUT')))
     except Exception as e:
         raise Exception(str(e))
 
     for bulb in discovered_bulbs:
-        ip = bulb['ip']
-        port = bulb['port']
-        model = bulb['capabilities']['model']
-        name = bulb['capabilities']['name']
-        name = name if name != '' else ip
-        identifier = bulb['capabilities']['id']
-        found_bulb = Bulb(
-            ip=ip,
-            port=port,
-            model=model
-        )
+        cached_bulbs.insert_bulb(bulb)
 
-        found_bulb.set_name(name)
-        properties = found_bulb.get_properties()
-
-        bulbs.append({
-            'id': identifier,
-            'bulb': found_bulb,
-            'name': name,
-            'model': model,
-            'ip': ip,
-            'metadata':
-                {
-                    'id': identifier,
-                    'ip': ip,
-                    'name': name,
-                    'model': model,
-                    'properties': properties
-                }
-        })
+    bulbs = cached_bulbs.list()
 
     return bulbs
 
@@ -135,17 +107,16 @@ class BulbColorController:
         bulb.set_rgb(red, green, blue)
 
 
-def get_bulbs(ip=None, name=None, model=None, metadata=False, identifier=None) -> list:
+def get_bulbs(ip=None, name=None, model=None, identifier=None, cache_only=False) -> list:
     """
     Get a list of bulbs by ip, name or model
     :param identifier:
     :param ip:
     :param name:
     :param model:
-    :param metadata:
+    :param cache_only:
     :return list:
     """
-    bulbs = list()
 
     param = 'ip'
     value = ip
@@ -165,9 +136,17 @@ def get_bulbs(ip=None, name=None, model=None, metadata=False, identifier=None) -
     elif ip:
         ipaddress.ip_address(str(ip))
 
-    for bulb in __sync_bulbs__():
-        if bulb[param] == value or return_all:
-            bulbs.append(bulb['metadata'] if metadata else bulb['bulb'])
+    if not cache_only:
+        __sync_bulbs__()
+
+    bulbs = cached_bulbs.list()
+
+    if return_all:
+        return bulbs
+    else:
+        for bulb in bulbs:
+            if bulb[param] != value:
+                bulbs.pop(bulb)
     return bulbs
 
 
@@ -180,6 +159,11 @@ def get_bulb(ip=None, identifier=None) -> Bulb:
     """
 
     if identifier:
+        for bulb in cached_bulbs.list():
+            if bulb['id'] == identifier:
+                ip = bulb['ip']
+
+    if not ip:
         for bulb in __sync_bulbs__():
             if bulb['id'] == identifier:
                 ip = bulb['ip']
@@ -207,7 +191,6 @@ class BulbController:
             ip=ip,
             name=name,
             model=model,
-            metadata=metadata,
             identifier=identifier
         )
 
@@ -279,8 +262,12 @@ class BulbController:
             if color_mode == 'temp':
                 BulbColorController.change_temp(bulb, values)
 
-            properties = bulb.get_properties()
-            return properties
+            cached_bulbs.update_cached_property(
+                bulb_id=identifier
+                , property_name='color_mode'
+                , property_value=color_mode
+            )
+            return cached_bulbs.cached_properties(bulb_id=identifier)
 
         except Exception as e:
             raise Exception(str(e))

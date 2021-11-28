@@ -21,7 +21,7 @@ class LightBulbs(Resource):
         args = parser.parse_args()
 
         try:
-            response = Bulbs.get_bulbs(metadata=True)
+            response = Bulbs.get_bulbs()
 
             if len(response) > 0:
                 fake_response = []
