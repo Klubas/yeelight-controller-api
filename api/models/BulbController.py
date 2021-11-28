@@ -1,30 +1,10 @@
-import ipaddress
-import os
-import socket
 from dotenv import load_dotenv
-from yeelight import discover_bulbs, Bulb, LightType
+from yeelight import LightType
 
 from api.models.BulbCache import BulbCache
 
 load_dotenv()
 cached_bulbs = BulbCache()
-
-
-def __sync_bulbs__() -> list:
-    """
-    Discover bulbs in local network and returns in a list
-    """
-    try:
-        discovered_bulbs = discover_bulbs(timeout=int(os.getenv('YC_SYNC_TIMEOUT')))
-    except Exception as e:
-        raise Exception(str(e))
-
-    for bulb in discovered_bulbs:
-        cached_bulbs.insert_bulb(bulb)
-
-    bulbs = cached_bulbs.list()
-
-    return bulbs
 
 
 class BulbColorController:
@@ -107,87 +87,14 @@ class BulbColorController:
         bulb.set_rgb(red, green, blue)
 
 
-def get_bulbs(ip=None, name=None, model=None, identifier=None, cache_only=False) -> list:
-    """
-    Get a list of bulbs by ip, name or model
-    :param identifier:
-    :param ip:
-    :param name:
-    :param model:
-    :param cache_only:
-    :return list:
-    """
-
-    param = 'ip'
-    value = ip
-    return_all = False
-
-    if name:
-        param = 'name'
-        value = name
-    elif model:
-        param = 'model'
-        value = model
-    elif not ip and not identifier:
-        return_all = True
-    elif identifier:
-        param = 'id'
-        value = identifier
-    elif ip:
-        ipaddress.ip_address(str(ip))
-
-    if not cache_only:
-        __sync_bulbs__()
-
-    bulbs = cached_bulbs.list()
-
-    if return_all:
-        return bulbs
-    else:
-        for bulb in bulbs:
-            if bulb[param] != value:
-                bulbs.pop(bulb)
-    return bulbs
-
-
-def get_bulb(ip=None, identifier=None) -> Bulb:
-    """
-    Get a Bulb by IP address
-    :param ip:
-    :param identifier:
-    :return:
-    """
-
-    if identifier:
-        for bulb in cached_bulbs.list():
-            if bulb['id'] == identifier:
-                ip = bulb['ip']
-
-    if not ip:
-        for bulb in __sync_bulbs__():
-            if bulb['id'] == identifier:
-                ip = bulb['ip']
-
-    if ip:
-        try:
-            bulb = Bulb(ip=ip)
-            ipaddress.ip_address(str(ip))
-            bulb.get_properties()
-            return bulb
-        except socket.error:
-            raise Exception("Bulb not found for the specified IP {}".format(ip))
-    else:
-        raise Exception("You must specify an ip address or bulb identifier.")
-
-
 class BulbController:
     @staticmethod
     def get_bulb(ip=None, identifier=None):
-        return get_bulb(ip=ip, identifier=identifier)
+        return cached_bulbs.get_bulb(ip=ip, identifier=identifier)
 
     @staticmethod
     def get_bulbs(ip=None, name=None, model=None, metadata=False, identifier=None):
-        return get_bulbs(
+        return cached_bulbs.get_bulbs(
             ip=ip,
             name=name,
             model=model,
@@ -208,7 +115,7 @@ class BulbController:
         if state.lower() not in states:
             raise Exception("Invalid power state [{}]. Must be in {}.".format(state, str(states)))
 
-        bulb = get_bulb(ip=ip, identifier=identifier)
+        bulb = cached_bulbs.get_bulb(ip=ip, identifier=identifier)
 
         try:
             if state == states[0]:  # on
@@ -244,7 +151,7 @@ class BulbController:
         if not values:
             raise Exception("Parameter <values> must be specified.")
 
-        bulb = get_bulb(ip=ip, identifier=identifier)
+        bulb = cached_bulbs.get_bulb(ip=ip, identifier=identifier)
 
         try:
             if not bulb:
@@ -267,7 +174,8 @@ class BulbController:
                 , property_name='color_mode'
                 , property_value=color_mode
             )
-            return cached_bulbs.cached_properties(bulb_id=identifier)
+            properties = bulb.get_properties()
+            return properties
 
         except Exception as e:
             raise Exception(str(e))
@@ -284,7 +192,7 @@ class BulbController:
         if not identifier and not ip and not new_name:
             raise Exception("Parameters <identifier> and <new_name> must be specified.")
 
-        bulb = get_bulb(ip=ip, identifier=identifier)
+        bulb = cached_bulbs.get_bulb(ip=ip, identifier=identifier)
 
         try:
             bulb.set_name(name=new_name)
