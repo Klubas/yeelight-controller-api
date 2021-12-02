@@ -18,26 +18,38 @@ class BulbCache:
         except Exception as e:
             raise Exception(str(e))
 
+        for bulb in self.list():
+            self.cached_bulbs[bulb['id']]['power'] = 'off'
+            self.update_cached_property(bulb['id'], 'online', False)
+
         for bulb in discovered_bulbs:
             self.insert_bulb(bulb)
 
         bulbs = self.list()
 
+        print('aqui')
+
         return bulbs
 
     def sync_bulb_properties(self, identifier):
         ip = self.cached_bulbs[identifier]['ip']
-        bulb = Bulb(ip=ip)
-        properties = bulb.get_properties()
 
-        self.cached_bulbs[identifier]['power'] = properties['power']
-        self.cached_bulbs[identifier]['bright'] = properties['bright']
-        self.cached_bulbs[identifier]['ct'] = properties['ct']
-        self.cached_bulbs[identifier]['rgb'] = properties['rgb']
-        self.cached_bulbs[identifier]['hue'] = properties['hue']
-        self.cached_bulbs[identifier]['sat'] = properties['sat']
-        self.cached_bulbs[identifier]['current_brightness'] = properties['current_brightness']
-        self.cached_bulbs[identifier]['timestamp'] = str(datetime.now())
+        try:
+            bulb = Bulb(ip=ip)
+            properties = bulb.get_properties()
+            self.cached_bulbs[identifier]['power'] = properties['power']
+            self.cached_bulbs[identifier]['bright'] = properties['bright']
+            self.cached_bulbs[identifier]['ct'] = properties['ct']
+            self.cached_bulbs[identifier]['rgb'] = properties['rgb']
+            self.cached_bulbs[identifier]['hue'] = properties['hue']
+            self.cached_bulbs[identifier]['sat'] = properties['sat']
+            self.cached_bulbs[identifier]['current_brightness'] = properties['current_brightness']
+            self.cached_bulbs[identifier]['timestamp'] = str(datetime.now())
+            self.update_cached_property(identifier, 'online', True)
+        except socket.error as e:
+            print(e)
+            self.cached_bulbs[identifier]['power'] = 'off'
+            self.update_cached_property(identifier, 'online', False)
 
     def get_bulbs(self, ip=None, name=None, model=None, identifier=None, cache_only=False) -> list:
         """
@@ -89,6 +101,9 @@ class BulbCache:
         :return:
         """
 
+        if not ip and not identifier:
+            raise Exception("You must specify an ip address or bulb identifier.")
+
         if identifier:
             for bulb in self.list():
                 if bulb['id'] == identifier:
@@ -106,9 +121,9 @@ class BulbCache:
                 bulb.get_properties()
                 return bulb
             except socket.error:
+                self.cached_bulbs[identifier]['power'] = 'off'
+                self.update_cached_property(identifier, 'online', False)
                 raise Exception("Bulb not found for the specified IP {}".format(ip))
-        else:
-            raise Exception("You must specify an ip address or bulb identifier.")
 
     def get_bulb_properties(self, identifier=None) -> dict:
         return self.cached_bulbs[identifier]
@@ -154,6 +169,7 @@ class BulbCache:
 
         if len(cached_properties.items()) == 0:
             self.update_cached_property(identifier, 'color_mode', 'temp')
+        self.update_cached_property(identifier, 'online', True)
 
     def update_property(self, identifier, property_name, property_value):
         self.cached_bulbs[identifier][property_name] = property_value
