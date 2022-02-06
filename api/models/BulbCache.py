@@ -27,8 +27,6 @@ class BulbCache:
 
         bulbs = self.list()
 
-        print('aqui')
-
         return bulbs
 
     def sync_bulb_properties(self, identifier):
