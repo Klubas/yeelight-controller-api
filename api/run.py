@@ -6,7 +6,7 @@ from flask_restful import Api, Resource
 from flask_cors import CORS
 from dotenv import load_dotenv
 
-from api.views.Index import Index, Favicon
+from api.views.Index import Index, Favicon, ApiIndex
 from api.views.LightBulbs import LightBulbs
 from api.views.LightBulb import LightBulb
 from api.views.Power import Power
@@ -24,7 +24,8 @@ app.config['BUNDLE_ERRORS'] = not os.getenv('YC_DISABLE_ERROR_BUNDLE')
 # add resources
 api = Api(app)
 api.add_resource(Favicon, '/favicon.ico')
-api.add_resource(Index, '/api')
+api.add_resource(Index, '/')
+api.add_resource(ApiIndex, '/api')
 api.add_resource(Logon, '/api/logon')
 api.add_resource(LightBulbs, '/api/bulbs')
 api.add_resource(LightBulb, '/api/bulb')

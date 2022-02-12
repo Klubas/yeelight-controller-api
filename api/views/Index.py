@@ -12,6 +12,18 @@ class Index(Resource):
             'Access-Control-Allow-Origin': '*'
         }
 
+        html = 'Hey!'
+        return make_response(html, 200, headers)
+
+
+class ApiIndex(Resource):
+    @staticmethod
+    def get():
+        headers = {
+            'Content-Type': 'text/html',
+            'Access-Control-Allow-Origin': '*'
+        }
+
         html = os.path.join('index.html')
         return make_response(
             render_template(html), 200, headers)
